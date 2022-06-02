@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<!-- simple elements -->
+	<xsd:element name="angularOnly" type="xsd:boolean"/>
+	<xsd:element name="angularBounce" type="vector3"/>
+	<xsd:element name="angularDamping" type="float"/>
+	<xsd:element name="angularEquilibrium" type="vector3"/>
+	<!-- angularLowerLimit: if undefined, it's set to (1,1,1) -->
+	<xsd:element name="angularLowerLimit" type="vector3"/>
+	<xsd:element name="angularStiffness" type="vector3"/>
+	<!-- angularUpperLimit: if undefined, it's set to (-1,-1,-1) -->
+	<xsd:element name="angularUpperLimit" type="vector3"/>
+	<xsd:element name="biasFactor" type="float"/>
+	<xsd:element name="can-collide-with-bone" type="xsd:string"/>
+	<xsd:element name="can-collide-with-tag" type="xsd:string"/>
+	<xsd:element name="centerOfMassTransform" type="transform"/>
+	<xsd:element name="collision-filter" type="xsd:int"/>
+	<xsd:element name="coneLimit" type="float"/>
+	<xsd:element name="damping" type="float"/>
+	<xsd:element name="disable-priority" type="xsd:int"/>
+	<xsd:element name="disable-tag" type="xsd:string"/>
+	<xsd:element name="equilibrium" type="float"/>
+	<xsd:element name="frameInA" type="transform"/>
+	<xsd:element name="frameInB" type="transform"/>
+	<xsd:element name="frameInLerp" type="lerp"/>
+	<xsd:element name="friction" type="float"/>
+	<xsd:element name="gravity-factor" type="float"/>
+	<xsd:element name="half-extend" type="vector3"/>
+	<xsd:element name="height" type="float"/>
+	<xsd:element name="inertia" type="vector3"/>
+	<xsd:element name="limitSoftness" type="float"/>
+	<xsd:element name="limitX" type="float"/>
+	<xsd:element name="limitY" type="float"/>
+	<xsd:element name="limitZ" type="float"/>
+	<xsd:element name="linearBounce" type="vector3"/>
+	<xsd:element name="linearDamping" type="float"/>
+	<xsd:element name="linearEquilibrium" type="vector3"/>
+	<xsd:element name="linearLowerLimit" type="vector3"/>
+	<xsd:element name="linearStiffness" type="vector3"/>
+	<xsd:element name="linearUpperLimit" type="vector3"/>
+	<xsd:element name="margin" type="float"/>
+	<xsd:element name="margin-multiplier" type="float"/>
+	<xsd:element name="mass" type="float"/>
+	<xsd:element name="maxDistanceFactor" type="float"/>
+	<xsd:element name="minDistanceFactor" type="float"/>
+	<xsd:element name="no-collide-with-bone" type="xsd:string"/>
+	<xsd:element name="no-collide-with-tag" type="xsd:string"/>
+	<xsd:element name="penetration" type="float"/>
+	<xsd:element name="planeLimit" type="float"/>
+	<xsd:element name="point" type="vector3"/>
+	<xsd:element name="prenetration" type="float"/>
+	<xsd:element name="radius" type="float"/>
+	<xsd:element name="relaxationFactor" type="float"/>
+	<xsd:element name="restitution" type="float"/>
+	<xsd:element name="rollingFriction" type="float"/>
+	<xsd:element name="stiffness" type="float"/>
+	<xsd:element name="swingSpan1" type="float"/>
+	<xsd:element name="swingSpan2" type="float"/>
+	<xsd:element name="tag" type="xsd:string"/>
+	<xsd:element name="transform" type="transform"/>
+	<xsd:element name="twistLimit" type="float"/>
+	<xsd:element name="twistSpan" type="float"/>
+	<xsd:element name="useLinearReferenceFrameA" type="xsd:boolean"/>
+	<xsd:element name="wind-effect" type="float"/>
+	<!-- complex elements -->
+	<xsd:element name="shared">
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration value="public"/>
+				<xsd:enumeration value="private"/>
+				<xsd:enumeration value="internal"/>
+				<xsd:enumeration value="external"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<!-- A "weight-threshold" in a "per-vertex-shape" or "per-triangle-shape"
+         contains a float value and a "bone" attribute. Each skinned bone with
+         that name in the "per-XXX-shape" has its weight-threshold set to the
+         float value. This weight-threshold is used 3 ways:
+         - When preparing collisions, no collision effect (displacement) is
+           considered if the weight of the bone is zero or lower than the
+           weight-threshold.
+         - When processing collisions, when a collision happen between 2
+           shapes, if the weight of the shape at the vertex or triangle
+           collision point is lower than the weight-threshold defined for the
+           vertex or triangle collision point bone, then the collision effects
+           aren't applied.
+         - In the CUDA version, the bone weight provided to the CUDA processor
+           is the bone weight-threshold. -->
+	<xsd:element name="weight-threshold">
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:extension base="float">
+					<xsd:attribute name="bone" type="xsd:string"/>
+				</xsd:extension>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- containers -->
+	<xsd:element name="per-triangle-shape">
+		<xsd:annotation>
+			<xsd:documentation>coucou</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element ref="margin"/>
+				<xsd:element ref="prenetration"/>
+				<xsd:element ref="penetration"/>
+				<xsd:element ref="tag"/>
+				<xsd:element ref="shared"/>
+				<xsd:element ref="no-collide-with-tag"/>
+				<xsd:element ref="no-collide-with-bone"/>
+				<xsd:element ref="can-collide-with-tag"/>
+				<xsd:element ref="can-collide-with-bone"/>
+				<xsd:element ref="weight-threshold"/>
+				<xsd:element ref="disable-tag"/>
+				<xsd:element ref="disable-priority"/>
+				<xsd:element ref="wind-effect"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- per-vertex-shape: there is no penetration tag inside per-vertex-shape. -->
+	<xsd:element name="per-vertex-shape">
+		<xsd:complexType>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element ref="margin"/>
+				<xsd:element ref="tag"/>
+				<xsd:element ref="shared"/>
+				<xsd:element ref="no-collide-with-tag"/>
+				<xsd:element ref="can-collide-with-tag"/>
+				<xsd:element ref="no-collide-with-bone"/>
+				<xsd:element ref="can-collide-with-bone"/>
+				<xsd:element ref="weight-threshold"/>
+				<xsd:element ref="disable-tag"/>
+				<xsd:element ref="disable-priority"/>
+				<xsd:element ref="wind-effect"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="bone-default">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="mass"/>
+				<xsd:element ref="inertia"/>
+				<xsd:element ref="centerOfMassTransform"/>
+				<xsd:element ref="linearDamping"/>
+				<xsd:element ref="angularDamping"/>
+				<xsd:element ref="gravity-factor"/>
+				<xsd:element ref="friction"/>
+				<xsd:element ref="rollingFriction"/>
+				<xsd:element ref="restitution"/>
+				<xsd:element ref="margin-multiplier"/>
+				<xsd:element ref="shape"/>
+				<xsd:element ref="collision-filter"/>
+				<xsd:element ref="can-collide-with-bone"/>
+				<xsd:element ref="no-collide-with-bone"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="extends" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="bone">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="mass"/>
+				<xsd:element ref="inertia"/>
+				<xsd:element ref="centerOfMassTransform"/>
+				<xsd:element ref="linearDamping"/>
+				<xsd:element ref="angularDamping"/>
+				<xsd:element ref="gravity-factor"/>
+				<xsd:element ref="friction"/>
+				<xsd:element ref="rollingFriction"/>
+				<xsd:element ref="restitution"/>
+				<xsd:element ref="margin-multiplier"/>
+				<xsd:element ref="shape"/>
+				<xsd:element ref="collision-filter"/>
+				<xsd:element ref="can-collide-with-bone"/>
+				<xsd:element ref="no-collide-with-bone"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="extends" type="xsd:string"/>
+			<xsd:attribute name="template" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="generic-constraint-default">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="angularBounce"/>
+				<xsd:element ref="angularEquilibrium"/>
+				<xsd:element ref="angularLowerLimit"/>
+				<xsd:element ref="angularUpperLimit"/>
+				<xsd:element ref="angularStiffness"/>
+				<xsd:element ref="frameInA"/>
+				<xsd:element ref="frameInB"/>
+				<xsd:element ref="frameInLerp"/>
+				<xsd:element ref="linearBounce"/>
+				<xsd:element ref="linearEquilibrium"/>
+				<xsd:element ref="linearLowerLimit"/>
+				<xsd:element ref="linearUpperLimit"/>
+				<xsd:element ref="linearStiffness"/>
+				<xsd:element ref="useLinearReferenceFrameA"/>
+				<!-- linear and angular damping are already declared as floats for bones -->
+				<xsd:element name="angularDamping" type="vector3"/>
+				<xsd:element name="linearDamping" type="vector3"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="extends" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="stiffspring-constraint-default">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="minDistanceFactor"/>
+				<xsd:element ref="maxDistanceFactor"/>
+				<xsd:element ref="stiffness"/>
+				<xsd:element ref="damping"/>
+				<xsd:element ref="equilibrium"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="extends" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="stiffspring-constraint">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="minDistanceFactor"/>
+				<xsd:element ref="maxDistanceFactor"/>
+				<xsd:element ref="stiffness"/>
+				<xsd:element ref="damping"/>
+				<xsd:element ref="equilibrium"/>
+			</xsd:choice>
+			<xsd:attribute name="bodyA" type="xsd:string"/>
+			<xsd:attribute name="bodyB" type="xsd:string"/>
+			<xsd:attribute name="template" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="conetwist-constraint-default">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="frameInA"/>
+				<xsd:element ref="frameInB"/>
+				<xsd:element ref="frameInLerp"/>
+				<xsd:element ref="angularOnly"/>
+				<xsd:element ref="swingSpan1"/>
+				<xsd:element ref="swingSpan2"/>
+				<xsd:element ref="twistSpan"/>
+				<xsd:element ref="coneLimit"/>
+				<xsd:element ref="planeLimit"/>
+				<xsd:element ref="twistLimit"/>
+				<xsd:element ref="limitX"/>
+				<xsd:element ref="limitY"/>
+				<xsd:element ref="limitZ"/>
+				<xsd:element ref="limitSoftness"/>
+				<xsd:element ref="biasFactor"/>
+				<xsd:element ref="relaxationFactor"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="extends" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="conetwist-constraint">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="frameInA"/>
+				<xsd:element ref="frameInB"/>
+				<xsd:element ref="frameInLerp"/>
+				<xsd:element ref="angularOnly"/>
+				<xsd:element ref="swingSpan1"/>
+				<xsd:element ref="swingSpan2"/>
+				<xsd:element ref="twistSpan"/>
+				<xsd:element ref="coneLimit"/>
+				<xsd:element ref="planeLimit"/>
+				<xsd:element ref="twistLimit"/>
+				<xsd:element ref="limitX"/>
+				<xsd:element ref="limitY"/>
+				<xsd:element ref="limitZ"/>
+				<xsd:element ref="limitSoftness"/>
+				<xsd:element ref="biasFactor"/>
+				<xsd:element ref="relaxationFactor"/>
+			</xsd:choice>
+			<xsd:attribute name="bodyA" type="xsd:string"/>
+			<xsd:attribute name="bodyB" type="xsd:string"/>
+			<xsd:attribute name="template" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="generic-constraint">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="angularBounce"/>
+				<xsd:element ref="angularEquilibrium"/>
+				<xsd:element ref="angularLowerLimit"/>
+				<xsd:element ref="angularStiffness"/>
+				<xsd:element ref="angularUpperLimit"/>
+				<xsd:element ref="frameInA"/>
+				<xsd:element ref="frameInB"/>
+				<xsd:element ref="frameInLerp"/>
+				<xsd:element ref="linearBounce"/>
+				<xsd:element ref="linearEquilibrium"/>
+				<xsd:element ref="linearLowerLimit"/>
+				<xsd:element ref="linearStiffness"/>
+				<xsd:element ref="linearUpperLimit"/>
+				<xsd:element ref="useLinearReferenceFrameA"/>
+				<!-- linear and angular damping are already declared as floats for bones -->
+				<xsd:element name="linearDamping" type="vector3"/>
+				<xsd:element name="angularDamping" type="vector3"/>
+			</xsd:choice>
+			<xsd:attribute name="bodyA" type="xsd:string"/>
+			<xsd:attribute name="bodyB" type="xsd:string"/>
+			<xsd:attribute name="template" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="constraint-group">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="generic-constraint"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="shapeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ref"/>
+			<xsd:enumeration value="box"/>
+			<xsd:enumeration value="sphere"/>
+			<xsd:enumeration value="capsule"/>
+			<xsd:enumeration value="hull"/>
+			<xsd:enumeration value="cylinder"/>
+			<xsd:enumeration value="compound"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="shape">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<!-- for type box -->
+				<xsd:element ref="half-extend"/>
+				<!-- for types box, hull and cylinder -->
+				<xsd:element ref="margin"/>
+				<!-- for types sphere, capsule and cylinder -->
+				<xsd:element ref="radius"/>
+				<!-- for types capsule and cylinder -->
+				<xsd:element ref="height"/>
+				<!-- for type hull -->
+				<xsd:element ref="point"/>
+				<!-- for type compound -->
+				<xsd:element ref="child"/>
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="type" type="shapeType"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="child">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="transform"/>
+				<xsd:element ref="shape"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="system">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="per-triangle-shape"/>
+				<xsd:element ref="per-vertex-shape"/>
+				<xsd:element ref="bone-default"/>
+				<xsd:element ref="bone"/>
+				<xsd:element ref="shape"/>
+				<xsd:element ref="generic-constraint-default"/>
+				<xsd:element ref="stiffspring-constraint-default"/>
+				<xsd:element ref="conetwist-constraint-default"/>
+				<xsd:element ref="generic-constraint"/>
+				<xsd:element ref="stiffspring-constraint"/>
+				<xsd:element ref="conetwist-constraint"/>
+				<xsd:element ref="constraint-group"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- New types -->
+	<xsd:complexType name="vector3">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="x" type="float"/>
+				<xsd:attribute name="y" type="float"/>
+				<xsd:attribute name="z" type="float"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="quaternion">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="x" type="float"/>
+				<xsd:attribute name="y" type="float"/>
+				<xsd:attribute name="z" type="float"/>
+				<xsd:attribute name="w" type="float"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="axisAngle">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="x" type="float"/>
+				<xsd:attribute name="y" type="float"/>
+				<xsd:attribute name="z" type="float"/>
+				<xsd:attribute name="angle" type="float"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="transform">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="basis" type="quaternion"/>
+			<xsd:element name="basis-axis-angle" type="axisAngle"/>
+			<xsd:element name="origin" type="vector3"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="lerp">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="translationLerp" type="float"/>
+				<xsd:attribute name="rotationLerp" type="float"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="float">
+		<xsd:restriction base="xsd:float">
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>
