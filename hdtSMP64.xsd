@@ -413,12 +413,10 @@
 		</xsd:choice>
 	</xsd:complexType>
 	<xsd:complexType name="lerp">
-		<xsd:simpleContent>
-			<xsd:extension base="xsd:string">
-				<xsd:attribute name="translationLerp" type="float"/>
-				<xsd:attribute name="rotationLerp" type="float"/>
-			</xsd:extension>
-		</xsd:simpleContent>
+		<xsd:choice minOccurs="0" maxOccurs="2">
+			<xsd:element name="translationLerp" type="float"/>
+			<xsd:element name="rotationLerp" type="float"/>
+		</xsd:choice>
 	</xsd:complexType>
 	<xsd:simpleType name="float">
 		<xsd:restriction base="xsd:float">
