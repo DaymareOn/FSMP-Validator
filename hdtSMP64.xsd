@@ -1,68 +1,395 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<!-- simple elements -->
-	<xsd:element name="angularOnly" type="xsd:boolean"/>
+	<xsd:element name="angularOnly" type="xsd:boolean">
+		<xsd:annotation>
+			<xsd:documentation>Optional. If undefined, it's set to false.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="angularBounce" type="vector3"/>
-	<xsd:element name="angularDamping" type="xsd:float"/>
+	<xsd:element name="angularDamping">
+		<xsd:annotation>
+			<xsd:documentation>Optional. Between 0 and 1. If undefined, it's set to 0.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+				<xsd:maxInclusive value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="angularEquilibrium" type="vector3"/>
-	<!-- angularLowerLimit: if undefined, it's set to (1,1,1) -->
-	<xsd:element name="angularLowerLimit" type="vector3"/>
+	<xsd:element name="angularLowerLimit" type="vector3">
+		<xsd:annotation>
+			<xsd:documentation>Optional. If undefined, it's set to (1,1,1).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="angularStiffness" type="vector3"/>
-	<!-- angularUpperLimit: if undefined, it's set to (-1,-1,-1) -->
-	<xsd:element name="angularUpperLimit" type="vector3"/>
-	<xsd:element name="biasFactor" type="xsd:float"/>
+	<xsd:element name="angularUpperLimit" type="vector3">
+		<xsd:annotation>
+			<xsd:documentation>Optional. If undefined, it's set to (-1,-1,-1).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="biasFactor">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Between 0 and 1. If undefined, it's set to 0.3.
+Bullet recommendation: between 0 and 0.6. This is the strength with which a constraint resists zeroth order (angular, not angular velocity) limit violation.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+				<xsd:maxInclusive value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="can-collide-with-bone" type="xsd:string"/>
 	<xsd:element name="can-collide-with-tag" type="xsd:string"/>
 	<xsd:element name="centerOfMassTransform" type="transform"/>
 	<xsd:element name="collision-filter" type="xsd:int"/>
-	<xsd:element name="coneLimit" type="xsd:float"/>
-	<xsd:element name="damping" type="xsd:float"/>
+	<xsd:element name="coneLimit">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the limitZ and swingSpan1 parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="damping">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Used to calculate damping in springstiff scale constraints, spring force in springstiff constraints, and the velocity error in constraints groups.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="disable-priority" type="xsd:int"/>
 	<xsd:element name="disable-tag" type="xsd:string"/>
-	<xsd:element name="equilibrium" type="xsd:float"/>
+	<xsd:element name="equilibrium">
+		<xsd:annotation>
+			<xsd:documentation>Optional. Between 0 and 1. If undefined, it's set to 0.5.
+Allows to calculate, linearly between the minDistance and the maxDistance, the equilibrium point between 2 bodies in a StiffSpring constraint.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+				<xsd:maxInclusive value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="frameInA" type="transform"/>
 	<xsd:element name="frameInB" type="transform"/>
 	<xsd:element name="frameInLerp" type="lerp"/>
-	<xsd:element name="friction" type="xsd:float"/>
-	<xsd:element name="gravity-factor" type="xsd:float"/>
+	<xsd:element name="friction" type="xsd:float">
+		<xsd:annotation>
+			<xsd:documentation>
+Optional. If undefined, it's set to 0.5.
+Allows to calculate rolling friction, spinning friction and combined friction between 2 bodies.
+Bullet recommendation: best simulation results happen when friction is non-zero.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="gravity-factor">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Between 0 and 1. If undefined, it's set to 1.
+Will be applied to the gravity of the bone.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+				<xsd:maxInclusive value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="half-extend" type="vector3"/>
-	<xsd:element name="height" type="xsd:float"/>
 	<xsd:element name="inertia" type="vector3"/>
-	<xsd:element name="limitSoftness" type="xsd:float"/>
-	<xsd:element name="limitX" type="xsd:float"/>
-	<xsd:element name="limitY" type="xsd:float"/>
-	<xsd:element name="limitZ" type="xsd:float"/>
+	<xsd:element name="limitSoftness">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Between 0 and 1. If undefined, it's set to 1.
+Bullet recommendations: between 0.8 and 1. This describes the % of limits where the movement is free. Beyond this softness %, the limit is gradually enforced until the "hard" (1.0) limit is reached.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+				<xsd:maxInclusive value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="limitZ">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the coneLimit and swingSpan1 parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="limitY">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the planeLimit and swingSpan2 parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="limitX">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the twistLimit and twistSpan parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="linearBounce" type="vector3"/>
-	<xsd:element name="linearDamping" type="xsd:float"/>
+	<xsd:element name="linearDamping">
+		<xsd:annotation>
+			<xsd:documentation>Optional. Between 0 and 1. If undefined, it's set to 0.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+				<xsd:maxInclusive value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="linearEquilibrium" type="vector3"/>
 	<xsd:element name="linearLowerLimit" type="vector3"/>
 	<xsd:element name="linearStiffness" type="vector3"/>
 	<xsd:element name="linearUpperLimit" type="vector3"/>
-	<xsd:element name="margin" type="xsd:float"/>
-	<xsd:element name="margin-multiplier" type="xsd:float"/>
-	<xsd:element name="mass" type="xsd:float"/>
-	<xsd:element name="maxDistanceFactor" type="xsd:float"/>
-	<xsd:element name="minDistanceFactor" type="xsd:float"/>
+	<xsd:element name="margin">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 1.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="margin-multiplier">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 1.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="mass">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive.
+Setting mass to zero or unset creates a fixed (non-dynamic) rigid body.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="maxDistanceFactor">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 1.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="minDistanceFactor">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 1.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="no-collide-with-bone" type="xsd:string"/>
 	<xsd:element name="no-collide-with-tag" type="xsd:string"/>
-	<xsd:element name="penetration" type="xsd:float"/>
-	<xsd:element name="planeLimit" type="xsd:float"/>
+	<xsd:element name="penetration">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to 1. Can be positive or negative.
+Day's comment: I'm not sure a negative penetration works exactly as the inverse of a positive in the CUDA code...
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float"/>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="planeLimit">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the limitY and swingSpan2 parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="point" type="vector3"/>
-	<xsd:element name="prenetration" type="xsd:float"/>
-	<xsd:element name="radius" type="xsd:float"/>
-	<xsd:element name="relaxationFactor" type="xsd:float"/>
-	<xsd:element name="restitution" type="xsd:float"/>
-	<xsd:element name="rollingFriction" type="xsd:float"/>
-	<xsd:element name="stiffness" type="xsd:float"/>
-	<xsd:element name="swingSpan1" type="xsd:float"/>
-	<xsd:element name="swingSpan2" type="xsd:float"/>
+	<xsd:element name="prenetration" type="xsd:float">
+		<xsd:annotation>
+			<xsd:documentation>
+				Strictly equivalent to penetration. Use penetration.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="relaxationFactor">
+		<xsd:annotation>
+			<xsd:documentation>Optional. Between 0 and 1. If undefined, it's set to 1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+				<xsd:maxInclusive value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="restitution">
+		<xsd:annotation>
+			<xsd:documentation>Optional. If undefined, it's set to 0.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float"/>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="rollingFriction">
+		<xsd:annotation>
+			<xsd:documentation>Optional. If undefined, it's set to 0.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float"/>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="stiffness">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="swingSpan1">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the coneLimit and limitZ parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="swingSpan2">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the limitY and planeLimit parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
 	<xsd:element name="tag" type="xsd:string"/>
 	<xsd:element name="transform" type="transform"/>
-	<xsd:element name="twistLimit" type="xsd:float"/>
-	<xsd:element name="twistSpan" type="xsd:float"/>
-	<xsd:element name="useLinearReferenceFrameA" type="xsd:boolean"/>
-	<xsd:element name="wind-effect" type="xsd:float"/>
-	<!-- complex elements -->
+	<xsd:element name="twistLimit">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the limitX and twistSpan parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="twistSpan">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Positive. If undefined, it's set to 0.
+Strictly equivalent to the twistLimit and limitX parameters.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float">
+				<xsd:minInclusive value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="useLinearReferenceFrameA" type="xsd:boolean">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to false.
+If false, the constraint will be set between BodyA, BodyB, FrameA, FrameB.
+If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="wind-effect" type="xsd:float">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to 0.
+Day's comment: seems unused in the code currently.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="shared">
 		<xsd:simpleType>
 			<xsd:restriction base="xsd:string">
@@ -73,21 +400,13 @@
 			</xsd:restriction>
 		</xsd:simpleType>
 	</xsd:element>
-	<!-- A "weight-threshold" in a "per-vertex-shape" or "per-triangle-shape"
-         contains a float value and a "bone" attribute. Each skinned bone with
-         that name in the "per-XXX-shape" has its weight-threshold set to the
-         float value. This weight-threshold is used 3 ways:
-         - When preparing collisions, no collision effect (displacement) is
-           considered if the weight of the bone is zero or lower than the
-           weight-threshold.
-         - When processing collisions, when a collision happen between 2
-           shapes, if the weight of the shape at the vertex or triangle
-           collision point is lower than the weight-threshold defined for the
-           vertex or triangle collision point bone, then the collision effects
-           aren't applied.
-         - In the CUDA version, the bone weight provided to the CUDA processor
-           is the bone weight-threshold. -->
 	<xsd:element name="weight-threshold">
+		<xsd:annotation>
+			<xsd:documentation>A "weight-threshold" in a "per-vertex-shape" or "per-triangle-shape" contains a float value and a "bone" attribute. Each skinned bone with that name in the "per-XXX-shape" has its weight-threshold set to the float value. This weight-threshold is used 3 ways:
+         - When preparing collisions, no collision effect (displacement) is considered if the weight of the bone is zero or lower than the weight-threshold.
+         - When processing collisions, when a collision happen between 2 shapes, if the weight of the shape at the vertex or triangle collision point is lower than the weight-threshold defined for the vertex or triangle collision point bone, then the collision effects aren't applied.
+         - In the CUDA version, the bone weight provided to the CUDA processor is the bone weight-threshold.</xsd:documentation>
+		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:simpleContent>
 				<xsd:extension base="xsd:float">
@@ -96,11 +415,7 @@
 			</xsd:simpleContent>
 		</xsd:complexType>
 	</xsd:element>
-	<!-- containers -->
 	<xsd:element name="per-triangle-shape">
-		<xsd:annotation>
-			<xsd:documentation>coucou</xsd:documentation>
-		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:choice maxOccurs="unbounded">
 				<xsd:element ref="margin"/>
@@ -120,8 +435,13 @@
 			<xsd:attribute name="name" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
-	<!-- per-vertex-shape: there is no penetration tag inside per-vertex-shape. -->
+	<!--  -->
 	<xsd:element name="per-vertex-shape">
+		<xsd:annotation>
+			<xsd:documentation>
+				per-vertex-shape: there is no penetration tag inside per-vertex-shape.
+			</xsd:documentation>
+		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:choice maxOccurs="unbounded">
 				<xsd:element ref="margin"/>
@@ -141,44 +461,44 @@
 	</xsd:element>
 	<xsd:element name="bone-default">
 		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="mass"/>
-				<xsd:element ref="inertia"/>
-				<xsd:element ref="centerOfMassTransform"/>
-				<xsd:element ref="linearDamping"/>
-				<xsd:element ref="angularDamping"/>
-				<xsd:element ref="gravity-factor"/>
-				<xsd:element ref="friction"/>
-				<xsd:element ref="rollingFriction"/>
-				<xsd:element ref="restitution"/>
-				<xsd:element ref="margin-multiplier"/>
-				<xsd:element ref="shape"/>
-				<xsd:element ref="collision-filter"/>
-				<xsd:element ref="can-collide-with-bone"/>
-				<xsd:element ref="no-collide-with-bone"/>
-			</xsd:choice>
+			<xsd:all>
+				<xsd:element ref="mass" minOccurs="0"/>
+				<xsd:element ref="inertia" minOccurs="0"/>
+				<xsd:element ref="centerOfMassTransform" minOccurs="0"/>
+				<xsd:element ref="linearDamping" minOccurs="0"/>
+				<xsd:element ref="angularDamping" minOccurs="0"/>
+				<xsd:element ref="gravity-factor" minOccurs="0"/>
+				<xsd:element ref="friction" minOccurs="0"/>
+				<xsd:element ref="rollingFriction" minOccurs="0"/>
+				<xsd:element ref="restitution" minOccurs="0"/>
+				<xsd:element ref="margin-multiplier" minOccurs="0"/>
+				<xsd:element ref="shape" minOccurs="0"/>
+				<xsd:element ref="collision-filter" minOccurs="0"/>
+				<xsd:element ref="can-collide-with-bone" minOccurs="0"/>
+				<xsd:element ref="no-collide-with-bone" minOccurs="0"/>
+			</xsd:all>
 			<xsd:attribute name="name" type="xsd:string"/>
 			<xsd:attribute name="extends" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="bone">
 		<xsd:complexType>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element ref="mass"/>
-				<xsd:element ref="inertia"/>
-				<xsd:element ref="centerOfMassTransform"/>
-				<xsd:element ref="linearDamping"/>
-				<xsd:element ref="angularDamping"/>
-				<xsd:element ref="gravity-factor"/>
-				<xsd:element ref="friction"/>
-				<xsd:element ref="rollingFriction"/>
-				<xsd:element ref="restitution"/>
-				<xsd:element ref="margin-multiplier"/>
-				<xsd:element ref="shape"/>
-				<xsd:element ref="collision-filter"/>
-				<xsd:element ref="can-collide-with-bone"/>
-				<xsd:element ref="no-collide-with-bone"/>
-			</xsd:choice>
+			<xsd:all>
+				<xsd:element ref="mass" minOccurs="0"/>
+				<xsd:element ref="inertia" minOccurs="0"/>
+				<xsd:element ref="centerOfMassTransform" minOccurs="0"/>
+				<xsd:element ref="linearDamping" minOccurs="0"/>
+				<xsd:element ref="angularDamping" minOccurs="0"/>
+				<xsd:element ref="gravity-factor" minOccurs="0"/>
+				<xsd:element ref="friction" minOccurs="0"/>
+				<xsd:element ref="rollingFriction" minOccurs="0"/>
+				<xsd:element ref="restitution" minOccurs="0"/>
+				<xsd:element ref="margin-multiplier" minOccurs="0"/>
+				<xsd:element ref="shape" minOccurs="0"/>
+				<xsd:element ref="collision-filter" minOccurs="0"/>
+				<xsd:element ref="can-collide-with-bone" minOccurs="0"/>
+				<xsd:element ref="no-collide-with-bone" minOccurs="0"/>
+			</xsd:all>
 			<xsd:attribute name="name" type="xsd:string"/>
 			<xsd:attribute name="extends" type="xsd:string"/>
 			<xsd:attribute name="template" type="xsd:string"/>
@@ -261,6 +581,13 @@
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="conetwist-constraint">
+		<xsd:annotation>
+			<xsd:documentation>
+				swingSpan1, coneLimit, limitX are strictly equivalent. You should declare only one of them.
+swingSpan2, planeLimit, limitY are strictly equivalent. You should declare only one of them.
+twistSpan, twistLimit, limitZ are strictly equivalent. You should declare only one of them.
+			</xsd:documentation>
+		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="frameInA"/>
@@ -332,18 +659,66 @@
 	<xsd:element name="shape">
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<!-- for type box -->
-				<xsd:element ref="half-extend"/>
-				<!-- for types box, hull and cylinder -->
-				<xsd:element ref="margin"/>
-				<!-- for types sphere, capsule and cylinder -->
-				<xsd:element ref="radius"/>
-				<!-- for types capsule and cylinder -->
-				<xsd:element ref="height"/>
-				<!-- for type hull -->
-				<xsd:element ref="point"/>
-				<!-- for type compound -->
-				<xsd:element ref="child"/>
+				<xsd:element ref="half-extend">
+					<xsd:annotation>
+						<xsd:documentation>
+							For type box
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="margin">
+					<xsd:annotation>
+						<xsd:documentation>
+							For types box, hull and cylinder.
+Optional. Positive. If undefined, it's set to 0.
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:float">
+							<xsd:minInclusive value="0"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="radius">
+					<xsd:annotation>
+						<xsd:documentation>
+							For types sphere, capsule and cylinder
+Optional. Positive. If undefined, it's set to 0.
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:float">
+							<xsd:minInclusive value="0"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="height">
+					<xsd:annotation>
+						<xsd:documentation>
+							For types capsule and cylinder
+Optional. Positive. If undefined, it's set to 0.
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:float">
+							<xsd:minInclusive value="0"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element ref="point">
+					<xsd:annotation>
+						<xsd:documentation>
+							For type hull
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element ref="child">
+					<xsd:annotation>
+						<xsd:documentation>
+							For type compound
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
 			</xsd:choice>
 			<xsd:attribute name="name" type="xsd:string"/>
 			<xsd:attribute name="type" type="shapeType"/>
@@ -375,7 +750,6 @@
 			</xsd:choice>
 		</xsd:complexType>
 	</xsd:element>
-	<!-- New types -->
 	<xsd:complexType name="vector3">
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
@@ -385,37 +759,49 @@
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="quaternion">
-		<xsd:simpleContent>
-			<xsd:extension base="xsd:string">
-				<xsd:attribute name="x" type="xsd:float"/>
-				<xsd:attribute name="y" type="xsd:float"/>
-				<xsd:attribute name="z" type="xsd:float"/>
-				<xsd:attribute name="w" type="xsd:float"/>
-			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<xsd:complexType name="axisAngle">
-		<xsd:simpleContent>
-			<xsd:extension base="xsd:string">
-				<xsd:attribute name="x" type="xsd:float"/>
-				<xsd:attribute name="y" type="xsd:float"/>
-				<xsd:attribute name="z" type="xsd:float"/>
-				<xsd:attribute name="angle" type="xsd:float"/>
-			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
 	<xsd:complexType name="transform">
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element name="basis" type="quaternion"/>
-			<xsd:element name="basis-axis-angle" type="axisAngle"/>
+			<xsd:element name="basis">
+				<xsd:annotation>
+					<xsd:documentation>
+						This is a quaternion. If it's set with a length of zero, it will be set as Identity (0, 0, 0, 1).
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="x" type="xsd:float"/>
+							<xsd:attribute name="y" type="xsd:float"/>
+							<xsd:attribute name="z" type="xsd:float"/>
+							<xsd:attribute name="w" type="xsd:float"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="basis-axis-angle">
+				<xsd:annotation>
+					<xsd:documentation>
+					This is a transformation rotation with an angle around an axis defined by a vector. If the vector (x, y, z) is (0, 0, 0), it will be set as (1,0,0), and the angle will be set at 0 whatever its value. The length of the vector isn't important as it will be normalized. The angle is in radians.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="x" type="xsd:float"/>
+							<xsd:attribute name="y" type="xsd:float"/>
+							<xsd:attribute name="z" type="xsd:float"/>
+							<xsd:attribute name="angle" type="xsd:float"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element name="origin" type="vector3"/>
 		</xsd:choice>
 	</xsd:complexType>
 	<xsd:complexType name="lerp">
-		<xsd:choice minOccurs="0" maxOccurs="2">
-			<xsd:element name="translationLerp" type="xsd:float"/>
-			<xsd:element name="rotationLerp" type="xsd:float"/>
-		</xsd:choice>
+		<xsd:all>
+			<xsd:element name="translationLerp" type="xsd:float" minOccurs="0"/>
+			<xsd:element name="rotationLerp" type="xsd:float" minOccurs="0"/>
+		</xsd:all>
 	</xsd:complexType>
 </xsd:schema>
