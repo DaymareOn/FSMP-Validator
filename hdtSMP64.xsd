@@ -410,7 +410,7 @@ Day's comment: seems unused in the code currently.
 		<xsd:complexType>
 			<xsd:simpleContent>
 				<xsd:extension base="xsd:float">
-					<xsd:attribute name="bone" type="xsd:string"/>
+					<xsd:attribute name="bone" type="xsd:string" use="required"/>
 				</xsd:extension>
 			</xsd:simpleContent>
 		</xsd:complexType>
@@ -432,7 +432,7 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="disable-priority"/>
 				<xsd:element ref="wind-effect"/>
 			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
 		</xsd:complexType>
 	</xsd:element>
 	<!--  -->
@@ -456,7 +456,7 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="disable-priority"/>
 				<xsd:element ref="wind-effect"/>
 			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="bone-default">
@@ -499,7 +499,7 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="can-collide-with-bone" minOccurs="0"/>
 				<xsd:element ref="no-collide-with-bone" minOccurs="0"/>
 			</xsd:all>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
 			<xsd:attribute name="extends" type="xsd:string"/>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
@@ -551,8 +551,8 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="damping"/>
 				<xsd:element ref="equilibrium"/>
 			</xsd:choice>
-			<xsd:attribute name="bodyA" type="xsd:string"/>
-			<xsd:attribute name="bodyB" type="xsd:string"/>
+			<xsd:attribute name="bodyA" type="xsd:string" use="required"/>
+			<xsd:attribute name="bodyB" type="xsd:string" use="required"/>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -607,8 +607,8 @@ twistSpan, twistLimit, limitZ are strictly equivalent. You should declare only o
 				<xsd:element ref="biasFactor"/>
 				<xsd:element ref="relaxationFactor"/>
 			</xsd:choice>
-			<xsd:attribute name="bodyA" type="xsd:string"/>
-			<xsd:attribute name="bodyB" type="xsd:string"/>
+			<xsd:attribute name="bodyA" type="xsd:string" use="required"/>
+			<xsd:attribute name="bodyB" type="xsd:string" use="required"/>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -633,8 +633,8 @@ twistSpan, twistLimit, limitZ are strictly equivalent. You should declare only o
 				<xsd:element name="linearDamping" type="vector3"/>
 				<xsd:element name="angularDamping" type="vector3"/>
 			</xsd:choice>
-			<xsd:attribute name="bodyA" type="xsd:string"/>
-			<xsd:attribute name="bodyB" type="xsd:string"/>
+			<xsd:attribute name="bodyA" type="xsd:string" use="required"/>
+			<xsd:attribute name="bodyB" type="xsd:string" use="required"/>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -721,7 +721,7 @@ Optional. Positive. If undefined, it's set to 0.
 				</xsd:element>
 			</xsd:choice>
 			<xsd:attribute name="name" type="xsd:string"/>
-			<xsd:attribute name="type" type="shapeType"/>
+			<xsd:attribute name="type" type="shapeType" use="required"/>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="child">
@@ -753,9 +753,9 @@ Optional. Positive. If undefined, it's set to 0.
 	<xsd:complexType name="vector3">
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="x" type="xsd:float"/>
-				<xsd:attribute name="y" type="xsd:float"/>
-				<xsd:attribute name="z" type="xsd:float"/>
+				<xsd:attribute name="x" type="xsd:float" use="required"/>
+				<xsd:attribute name="y" type="xsd:float" use="required"/>
+				<xsd:attribute name="z" type="xsd:float" use="required"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -770,10 +770,10 @@ Optional. Positive. If undefined, it's set to 0.
 				<xsd:complexType>
 					<xsd:simpleContent>
 						<xsd:extension base="xsd:string">
-							<xsd:attribute name="x" type="xsd:float"/>
-							<xsd:attribute name="y" type="xsd:float"/>
-							<xsd:attribute name="z" type="xsd:float"/>
-							<xsd:attribute name="w" type="xsd:float"/>
+							<xsd:attribute name="x" type="xsd:float" use="required"/>
+							<xsd:attribute name="y" type="xsd:float" use="required"/>
+							<xsd:attribute name="z" type="xsd:float" use="required"/>
+							<xsd:attribute name="w" type="xsd:float" use="required"/>
 						</xsd:extension>
 					</xsd:simpleContent>
 				</xsd:complexType>
