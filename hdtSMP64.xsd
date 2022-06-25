@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<xsd:schema
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="FSMP-Validator"
+	targetNamespace="FSMP-Validator"
+	elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+	>
 	<xsd:element name="angularOnly" type="xsd:boolean">
 		<xsd:annotation>
 			<xsd:documentation>Optional. If undefined, it's set to false.</xsd:documentation>
@@ -29,6 +36,23 @@
 			<xsd:documentation>Optional. If undefined, it's set to (-1,-1,-1).</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
+			<xsd:element name="basis">
+				<xsd:annotation>
+					<xsd:documentation>
+						This is a quaternion. If it's set with a length of zero, it will be set as Identity (0, 0, 0, 1).
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="x" type="xsd:float" use="required"/>
+							<xsd:attribute name="y" type="xsd:float" use="required"/>
+							<xsd:attribute name="z" type="xsd:float" use="required"/>
+							<xsd:attribute name="w" type="xsd:float" use="required"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
 	<xsd:element name="biasFactor">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -435,7 +459,6 @@ Day's comment: seems unused in the code currently.
 			<xsd:attribute name="name" type="xsd:string" use="required"/>
 		</xsd:complexType>
 	</xsd:element>
-	<!--  -->
 	<xsd:element name="per-vertex-shape">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -477,11 +500,25 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="can-collide-with-bone" minOccurs="0"/>
 				<xsd:element ref="no-collide-with-bone" minOccurs="0"/>
 			</xsd:all>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>
+						The name of a bone-default is optional. If it isn't set, "" is the name.
+						As the xml is interpreted line by line, you can redefine the default so that it impacts the following bones.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="extends" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="bone">
+		<xsd:annotation>
+			<xsd:documentation>
+				Bones can be used in constraints tags, can-collide-with-bone tags and no-collide-with-bone tags without being declared in a bone tag.
+				If a node with that name exists, a bone will be created on the fly with the current bone-default values.
+				Beware: bones can be created only once; the second declaration won't be taken into account, and will issue a warning in hdtSMP64.log saying that the bone is skipped.
+			</xsd:documentation>
+		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:all>
 				<xsd:element ref="mass" minOccurs="0"/>
@@ -525,7 +562,14 @@ Day's comment: seems unused in the code currently.
 				<xsd:element name="angularDamping" type="vector3"/>
 				<xsd:element name="linearDamping" type="vector3"/>
 			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>
+						The name of a generic-constraint-default is optional. If it isn't set, "" is the name.
+						As the xml is interpreted line by line, you can redefine the default so that it impacts the following generic-constraints.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="extends" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -538,7 +582,14 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="damping"/>
 				<xsd:element ref="equilibrium"/>
 			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>
+						The name of a stiffspring-constraint-default is optional. If it isn't set, "" is the name.
+						As the xml is interpreted line by line, you can redefine the default so that it impacts the following stiffspring-constraints.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="extends" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -551,8 +602,20 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="damping"/>
 				<xsd:element ref="equilibrium"/>
 			</xsd:choice>
-			<xsd:attribute name="bodyA" type="xsd:string" use="required"/>
-			<xsd:attribute name="bodyB" type="xsd:string" use="required"/>
+			<xsd:attribute name="bodyA" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation>
+						bodyA is required and must contain a bone name. Bone declaration is optional, see the bone documentation.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="bodyB" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation>
+						bodyB is required and must contain a bone name. Bone declaration is optional, see the bone documentation.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -576,7 +639,14 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="biasFactor"/>
 				<xsd:element ref="relaxationFactor"/>
 			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>
+						The name of a conetwist-constraint-default is optional. If it isn't set, "" is the name.
+						As the xml is interpreted line by line, you can redefine the default so that it impacts the following conetwist-constraints.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="extends" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -607,8 +677,20 @@ twistSpan, twistLimit, limitZ are strictly equivalent. You should declare only o
 				<xsd:element ref="biasFactor"/>
 				<xsd:element ref="relaxationFactor"/>
 			</xsd:choice>
-			<xsd:attribute name="bodyA" type="xsd:string" use="required"/>
-			<xsd:attribute name="bodyB" type="xsd:string" use="required"/>
+			<xsd:attribute name="bodyA" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation>
+						bodyA is required and must contain a bone name. Bone declaration is optional, see the bone documentation.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="bodyB" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation>
+						bodyB is required and must contain a bone name. Bone declaration is optional, see the bone documentation.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -633,8 +715,20 @@ twistSpan, twistLimit, limitZ are strictly equivalent. You should declare only o
 				<xsd:element name="linearDamping" type="vector3"/>
 				<xsd:element name="angularDamping" type="vector3"/>
 			</xsd:choice>
-			<xsd:attribute name="bodyA" type="xsd:string" use="required"/>
-			<xsd:attribute name="bodyB" type="xsd:string" use="required"/>
+			<xsd:attribute name="bodyA" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation>
+						bodyA is required and must contain a bone name. Bone declaration is optional, see the bone documentation.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="bodyB" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation>
+						bodyB is required and must contain a bone name. Bone declaration is optional, see the bone documentation.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -642,6 +736,11 @@ twistSpan, twistLimit, limitZ are strictly equivalent. You should declare only o
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element ref="generic-constraint"/>
+				<xsd:element ref="generic-constraint-default"/>
+				<xsd:element ref="stiffspring-constraint"/>
+				<xsd:element ref="stiffspring-constraint-default"/>
+				<xsd:element ref="conetwist-constraint"/>
+				<xsd:element ref="conetwist-constraint-default"/>
 			</xsd:choice>
 		</xsd:complexType>
 	</xsd:element>
@@ -720,7 +819,14 @@ Optional. Positive. If undefined, it's set to 0.
 					</xsd:annotation>
 				</xsd:element>
 			</xsd:choice>
-			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>
+						If type = "ref", then name is required and must be the name of a shape of another type.
+						In other cases, name is not required, except if you want to be able to reference it from a shape of type "ref".
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
 			<xsd:attribute name="type" type="shapeType" use="required"/>
 		</xsd:complexType>
 	</xsd:element>
@@ -735,20 +841,80 @@ Optional. Positive. If undefined, it's set to 0.
 	<xsd:element name="system">
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="bone"/>
+				<xsd:element ref="bone-default"/>
+				<xsd:element ref="conetwist-constraint"/>
+				<xsd:element ref="conetwist-constraint-default"/>
+				<xsd:element ref="constraint-group"/>
+				<xsd:element ref="generic-constraint"/>
+				<xsd:element ref="generic-constraint-default"/>
 				<xsd:element ref="per-triangle-shape"/>
 				<xsd:element ref="per-vertex-shape"/>
-				<xsd:element ref="bone-default"/>
-				<xsd:element ref="bone"/>
 				<xsd:element ref="shape"/>
-				<xsd:element ref="generic-constraint-default"/>
-				<xsd:element ref="stiffspring-constraint-default"/>
-				<xsd:element ref="conetwist-constraint-default"/>
-				<xsd:element ref="generic-constraint"/>
 				<xsd:element ref="stiffspring-constraint"/>
-				<xsd:element ref="conetwist-constraint"/>
-				<xsd:element ref="constraint-group"/>
+				<xsd:element ref="stiffspring-constraint-default"/>
 			</xsd:choice>
 		</xsd:complexType>
+		<xsd:key name="boneKey">
+			<xsd:selector xpath="bone"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
+		<xsd:unique name="boneDefaultKey">
+			<xsd:selector xpath="bone-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="boneDefaultKeyInBoneTemplate" refer="boneDefaultKey">
+			<xsd:selector xpath="bone"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="boneDefaultKeyInBoneExtends" refer="boneDefaultKey">
+			<xsd:selector xpath="bone|bone-default"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:unique name="conetwistConstraintDefaultKey">
+			<xsd:selector xpath="conetwist-constraint-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="conetwistConstraintDefaultKeyInConetwistConstraint" refer="conetwistConstraintDefaultKey">
+			<xsd:selector xpath="conetwist-constraint"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="conetwistConstraintDefaultKeyInConetwistConstraintTemplate" refer="conetwistConstraintDefaultKey">
+			<xsd:selector xpath="conetwist-constraint-template"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:unique name="stiffspringConstraintDefaultKey">
+			<xsd:selector xpath="stiffspring-constraint-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="stiffspringConstraintDefaultKeyInStiffspringConstraint" refer="stiffspringConstraintDefaultKey">
+			<xsd:selector xpath="stiffspring-constraint"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="stiffspringConstraintDefaultKeyInStiffspringConstraintTemplate" refer="stiffspringConstraintDefaultKey">
+			<xsd:selector xpath="stiffspring-constraint-template"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:unique name="genericConstraintDefaultKey">
+			<xsd:selector xpath="generic-constraint-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="genericConstraintDefaultKeyInGenericConstraint" refer="genericConstraintDefaultKey">
+			<xsd:selector xpath="generic-constraint"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="genericConstraintDefaultKeyInGenericConstraintTemplate" refer="genericConstraintDefaultKey">
+			<xsd:selector xpath="generic-constraint-template"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:key name="per-triangle-shapeKey">
+			<xsd:selector xpath="per-triangle-shape"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
+		<xsd:key name="per-vertex-shapeKey">
+			<xsd:selector xpath="per-vertex-shape"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
 	</xsd:element>
 	<xsd:complexType name="vector3">
 		<xsd:simpleContent>
@@ -761,23 +927,7 @@ Optional. Positive. If undefined, it's set to 0.
 	</xsd:complexType>
 	<xsd:complexType name="transform">
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element name="basis">
-				<xsd:annotation>
-					<xsd:documentation>
-						This is a quaternion. If it's set with a length of zero, it will be set as Identity (0, 0, 0, 1).
-					</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:simpleContent>
-						<xsd:extension base="xsd:string">
-							<xsd:attribute name="x" type="xsd:float" use="required"/>
-							<xsd:attribute name="y" type="xsd:float" use="required"/>
-							<xsd:attribute name="z" type="xsd:float" use="required"/>
-							<xsd:attribute name="w" type="xsd:float" use="required"/>
-						</xsd:extension>
-					</xsd:simpleContent>
-				</xsd:complexType>
-			</xsd:element>
+			<xsd:element ref="basis" />
 			<xsd:element name="basis-axis-angle">
 				<xsd:annotation>
 					<xsd:documentation>
@@ -787,10 +937,10 @@ Optional. Positive. If undefined, it's set to 0.
 				<xsd:complexType>
 					<xsd:simpleContent>
 						<xsd:extension base="xsd:string">
-							<xsd:attribute name="x" type="xsd:float"/>
-							<xsd:attribute name="y" type="xsd:float"/>
-							<xsd:attribute name="z" type="xsd:float"/>
-							<xsd:attribute name="angle" type="xsd:float"/>
+							<xsd:attribute name="x" type="xsd:float" use="required"/>
+							<xsd:attribute name="y" type="xsd:float" use="required"/>
+							<xsd:attribute name="z" type="xsd:float" use="required"/>
+							<xsd:attribute name="angle" type="xsd:float" use="required"/>
 						</xsd:extension>
 					</xsd:simpleContent>
 				</xsd:complexType>
