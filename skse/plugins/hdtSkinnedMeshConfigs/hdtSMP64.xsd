@@ -7,11 +7,6 @@
 	elementFormDefault="qualified"
     attributeFormDefault="unqualified"
 	>
-	<xsd:element name="angularOnly" type="xsd:boolean">
-		<xsd:annotation>
-			<xsd:documentation>Optional. If undefined, it's set to false.</xsd:documentation>
-		</xsd:annotation>
-	</xsd:element>
 	<xsd:element name="angularBounce" type="vector3"/>
 	<xsd:element name="angularDamping">
 		<xsd:annotation>
@@ -625,7 +620,6 @@ Day's comment: seems unused in the code currently.
 				<xsd:element ref="frameInA"/>
 				<xsd:element ref="frameInB"/>
 				<xsd:element ref="frameInLerp"/>
-				<xsd:element ref="angularOnly"/>
 				<xsd:element ref="swingSpan1"/>
 				<xsd:element ref="swingSpan2"/>
 				<xsd:element ref="twistSpan"/>
@@ -663,7 +657,6 @@ twistSpan, twistLimit, limitZ are strictly equivalent. You should declare only o
 				<xsd:element ref="frameInA"/>
 				<xsd:element ref="frameInB"/>
 				<xsd:element ref="frameInLerp"/>
-				<xsd:element ref="angularOnly"/>
 				<xsd:element ref="swingSpan1"/>
 				<xsd:element ref="swingSpan2"/>
 				<xsd:element ref="twistSpan"/>
