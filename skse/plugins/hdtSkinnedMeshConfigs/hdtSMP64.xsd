@@ -18,7 +18,13 @@
 	</xsd:element>
 	<xsd:element name="angularDamping">
 		<xsd:annotation>
-			<xsd:documentation>Optional. Between 0 and 1. If undefined, it's set to 0.</xsd:documentation>
+			<xsd:documentation>
+				Optional. Between 0 and 1, will be clamped. If undefined, it's set to 0.
+				Sets the angularDamping on the btRigidBody of a bone.
+				Each physics step, the damping is applied on the btRigidBody angular velocity with this formula:
+				angularVelocity *= pow(1 - angularDamping, timeStep)
+				Timestep is in seconds.
+			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleType>
 			<xsd:restriction base="xsd:float">
