@@ -49,6 +49,7 @@
 				Optional. If undefined, it's set to (1,1,1) (sic!). Each axis is in radians, and will be translated towards [-Pi, Pi].
 				The Generic 6 Degrees of Freedom Spring 2 constraint contains a 3D vector of angular limits (Rotational Limit Motor 2),
 				and this sets the minimum radian value of the angular constraint.
+				Beware: lower limit being greater than upper limit is interpreted as no constraint.
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
@@ -59,6 +60,7 @@
 				Optional. If undefined, it's set to (-1,-1,-1) (sic!). Each axis is in radians, and will be translated towards [-Pi, Pi].
 				The Generic 6 Degrees of Freedom Spring 2 constraint contains a 3D vector of angular limits (Rotational Limit Motor 2),
 				and this sets the maximum radian value of the angular constraint.
+				Beware: lower limit being greater than upper limit is interpreted as no constraint.
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
