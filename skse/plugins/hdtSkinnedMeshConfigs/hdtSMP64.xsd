@@ -45,13 +45,21 @@
 	</xsd:element>
 	<xsd:element name="angularLowerLimit" type="vector3">
 		<xsd:annotation>
-			<xsd:documentation>Optional. If undefined, it's set to (1,1,1).</xsd:documentation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to (1,1,1) (sic!). Each axis is in radians, and will be translated towards [-Pi, Pi].
+				The Generic 6 Degrees of Freedom Spring 2 constraint contains a 3D vector of angular limits (Rotational Limit Motor 2),
+				and this sets the minimum radian value of the angular constraint.
+			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="angularStiffness" type="vector3"/>
 	<xsd:element name="angularUpperLimit" type="vector3">
 		<xsd:annotation>
-			<xsd:documentation>Optional. If undefined, it's set to (-1,-1,-1).</xsd:documentation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to (-1,-1,-1) (sic!). Each axis is in radians, and will be translated towards [-Pi, Pi].
+				The Generic 6 Degrees of Freedom Spring 2 constraint contains a 3D vector of angular limits (Rotational Limit Motor 2),
+				and this sets the maximum radian value of the angular constraint.
+			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 			<xsd:element name="basis">
