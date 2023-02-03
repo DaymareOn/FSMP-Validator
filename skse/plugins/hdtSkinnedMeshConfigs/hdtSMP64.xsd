@@ -945,9 +945,21 @@ Optional. Positive. If undefined, it's set to 0.
 	<xsd:complexType name="vector3">
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="x" type="xsd:float" use="required"/>
-				<xsd:attribute name="y" type="xsd:float" use="required"/>
-				<xsd:attribute name="z" type="xsd:float" use="required"/>
+				<xsd:attribute name="x" type="xsd:float" use="required">
+					<xsd:annotation>
+						<xsd:documentation>float</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="y" type="xsd:float" use="required">
+					<xsd:annotation>
+						<xsd:documentation>float</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="z" type="xsd:float" use="required">
+					<xsd:annotation>
+						<xsd:documentation>float</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
