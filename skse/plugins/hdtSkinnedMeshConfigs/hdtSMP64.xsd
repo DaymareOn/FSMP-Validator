@@ -9,10 +9,11 @@
 	>
 	<xsd:element name="angularBounce" type="vector3">
 		<xsd:annotation>
-			<xsd:documentation>Optional. If undefined, it's set to (0.0, 0.0, 0.0).
-			Sets the bounce on the rotational limit motor on a generic constraint (Generic6DofSpring2Constraint).
-			Is used to calculate the bounce error, which is used to limit the constraint error.
-			It's the only use I saw in the code.
+			<xsd:documentation>
+				Optional. If undefined, it's set to (0.0, 0.0, 0.0).
+				Sets the bounce on the rotational limit motor on a generic 6 degrees of freedom constraint (Generic6DofSpring2Constraint).
+				Is used to calculate the bounce error, which is used to limit the constraint error.
+				It's the only use I saw in the code.
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
