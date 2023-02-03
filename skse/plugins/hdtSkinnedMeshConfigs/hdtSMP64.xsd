@@ -53,7 +53,20 @@
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="angularStiffness" type="vector3"/>
+	<xsd:element name="angularStiffness" type="vector3">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to (0,0,0).
+				The Generic 6 Degrees of Freedom Spring 2 constraint contains a 3D vector of angular limits (Rotational Limit Motor 2),
+				and this sets the spring stiffness of the angular constraint.
+				This stiffness will be dynamically limited: "the spring should not be sampled faster that the quarter of its angular frequency"
+				max stiffness = mass / (16 * dt * dt) (dt being the timestep)
+				What sets the direction of the new velocity is the sign of:
+				stiffness * distance from the equilibrium point - damping * velocity.
+				NB: damping is dynamically limited too: max damping = m / dt
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="angularUpperLimit" type="vector3">
 		<xsd:annotation>
 			<xsd:documentation>
