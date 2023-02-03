@@ -77,23 +77,6 @@
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-			<xsd:element name="basis">
-				<xsd:annotation>
-					<xsd:documentation>
-						This is a quaternion. If it's set with a length of zero, it will be set as Identity (0, 0, 0, 1).
-					</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:simpleContent>
-						<xsd:extension base="xsd:string">
-							<xsd:attribute name="x" type="xsd:float" use="required"/>
-							<xsd:attribute name="y" type="xsd:float" use="required"/>
-							<xsd:attribute name="z" type="xsd:float" use="required"/>
-							<xsd:attribute name="w" type="xsd:float" use="required"/>
-						</xsd:extension>
-					</xsd:simpleContent>
-				</xsd:complexType>
-			</xsd:element>
 	<xsd:element name="biasFactor">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -978,7 +961,23 @@ Optional. Positive. If undefined, it's set to 0.
 	</xsd:complexType>
 	<xsd:complexType name="transform">
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element ref="basis" />
+			<xsd:element name="basis">
+				<xsd:annotation>
+					<xsd:documentation>
+						This is a quaternion. If it's set with a length of zero, it will be set as Identity (0, 0, 0, 1).
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="x" type="xsd:float" use="required"/>
+							<xsd:attribute name="y" type="xsd:float" use="required"/>
+							<xsd:attribute name="z" type="xsd:float" use="required"/>
+							<xsd:attribute name="w" type="xsd:float" use="required"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element name="basis-axis-angle">
 				<xsd:annotation>
 					<xsd:documentation>
