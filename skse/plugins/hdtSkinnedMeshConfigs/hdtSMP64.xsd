@@ -34,7 +34,15 @@
 			</xsd:restriction>
 		</xsd:simpleType>
 	</xsd:element>
-	<xsd:element name="angularEquilibrium" type="vector3"/>
+	<xsd:element name="angularEquilibrium" type="vector3">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to (0.0, 0.0, 0.0).
+				Sets the orientation of the equilibrium point of a generic 6 degrees of freedom constraint (Generic6DofSpring2Constraint).
+				The code existing in Bullet to calculate it automatically isn't used.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="angularLowerLimit" type="vector3">
 		<xsd:annotation>
 			<xsd:documentation>Optional. If undefined, it's set to (1,1,1).</xsd:documentation>
