@@ -441,12 +441,16 @@ Day's comment: seems unused in the code currently.
 	<xsd:element name="shared">
 		<xsd:annotation>
 			<xsd:documentation>
-				Optional. If undefined or mystyped, it's set to "public".
+				Optional. Case-sensitive. If undefined or mistyped, it's set to "public".
 				it can take 4 values: "public", "internal", "external" and "private".
 				If the value is "public", the shape can collide with a body B if the shape's body can collide with that body B.
+				Webspam phrasing: "Shape can match collisions anywhere, including other XML files on other skeletons."
 				If the value is "internal", the shape can't collide with a shape from another skeleton; if it's the same skeleton, then see "public".
+				Webspam phrasing: "Shape can be referenced by any XML file, but only on this skeleton."
 				If the value is "external", the shape can't collide with a shape from the same skeleton; if it's another skeleton, then see "public".
+				Webspam phrasing: "Shape can be referenced by any XML file, but only on other skeletons."
 				If the value is "private", the shape can't collide with another mesh; if it's the same mesh, then see "public".
+				Webspam phrasing: "Shape can only be referenced within this file."
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleType>
