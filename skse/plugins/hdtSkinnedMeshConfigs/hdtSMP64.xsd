@@ -13,7 +13,7 @@
 	<!-- ############################################################ -->
 
 	<xsd:attributeGroup name="defaults">
-        <xsd:attribute name="name" type="xsd:string" use="required">
+        <xsd:attribute name="name" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
 					The name of a bone-default or generic-constraint-default is optional. If it isn't set, "" is the name.
