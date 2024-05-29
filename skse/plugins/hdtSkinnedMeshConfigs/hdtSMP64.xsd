@@ -6,6 +6,7 @@
 	targetNamespace="FSMP-Validator"
 	elementFormDefault="qualified"
     attributeFormDefault="unqualified"
+	version="2.1.0"
 	>
 
 	<!-- ############################################################ -->
