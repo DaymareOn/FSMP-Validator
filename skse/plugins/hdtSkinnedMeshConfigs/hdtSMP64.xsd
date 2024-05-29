@@ -20,6 +20,13 @@
 As the xml is interpreted line by line, you can redefine the default so that it impacts the following bones or generic-constraints.
                 </xsd:documentation>
             </xsd:annotation>
+			<!-- We could replace the type string by something more "ID"
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:ID">
+					<xsd:pattern value=".*" />
+				</xsd:restriction>
+			</xsd:simpleType>
+			-->
         </xsd:attribute>
         <xsd:attribute name="extends" type="xsd:string" use="optional"/>
     </xsd:attributeGroup>
@@ -162,24 +169,39 @@ Use angularStiffnessLimited to remove the cap (do not set this to 1.0).
 		<xsd:annotation>
 			<xsd:documentation>
 				Optional. If undefined, it's set to (0,0,0).
-The Generic 6 Degrees of Freedom Spring 2 constraint contains a 3D vector of angular limits (Rotational Limit Motor 2),
-and this sets the spring stiffness of the angular constraint.
-This stiffness will be dynamically limited: "the spring should not be sampled faster that the quarter of its angular frequency"
-max stiffness = mass / (16 * dt * dt) (dt being the timestep)
-What sets the direction of the new velocity is the sign of:
-stiffness * distance from the equilibrium point - damping * velocity.
-NB: damping is dynamically limited too: max damping = m / dt
+				The Generic 6 Degrees of Freedom Spring 2 constraint contains a 3D vector of angular limits (Rotational Limit Motor 2),
+				and this sets the spring stiffness of the angular constraint.
+				This stiffness will be dynamically limited: "the spring should not be sampled faster that the quarter of its angular frequency"
+				max stiffness = mass / (16 * dt * dt) (dt being the timestep)
+				What sets the direction of the new velocity is the sign of:
+				stiffness * distance from the equilibrium point - damping * velocity.
+				NB: damping is dynamically limited too: max damping = m / dt
+				Quick way to define it: mass * 40 * (turns per second) * (turns per second)
+				Here is the explanation: angular stiffness = mass * (angular frequency)^2 = mass * 4 * Pi^2 * (turns per second)^2
+				For example, if you have a mass of 1 kg, and you want it to oscillate around the x axis 2 times per second, you'll have::
+				(1 * 4 * Pi^2 * 2^2, , ) = (157.91, , )
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="angularStiffnessLimited" type="xsd:boolean">
         <xsd:annotation>
             <xsd:documentation>
-                FSMP 2.x: Optional. Completely removes the cap on frequency of calculations done for spring translation.
-angularStiffness may need to be adjusted (down, a lot).
+                FSMP 2.x: Optional. If undefined, it's set to true.
+				Limits the spring frequency to max 0.25 turns per timestep.
+				Honestly, you should set it to false and set your stiffness at the right level, because this limit is way too high:
+				when you attain it, the spring will oscillate around once every 4 frames, you will perceive incredible jittering!
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+	<xsd:element name="springDampingLimited" type="xsd:boolean">
+		<xsd:annotation>
+			<xsd:documentation>
+				FSMP 2.x: Optional. If undefined, it's set to true.
+				Limits the spring damping to mass x fps. This doesn't work for elements which could be scaled (like a body) because changing the scale changes the mass.
+				You should set it to false.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="angularTargetVelocity" type="vector3">
 		<xsd:annotation>
 			<xsd:documentation>FSMP 2.x: Optional. Vector3. Target velocity of angular motors.</xsd:documentation>
@@ -207,13 +229,24 @@ This is the strength with which a constraint resists zeroth order (angular, not 
 	<xsd:element name="can-collide-with-bone" type="xsd:string">
         <xsd:annotation>
             <xsd:documentation>
-                Optional. Bone name.
-IMPORTANT: the setting can-collide-with-bone will override any configuration of can/no-collide-with-tag, and ignore no-collide-with-bones.
-When you set this value, you are saying "collide with the bones I list, and literally nothing else".
-            </xsd:documentation>
+				Optional. Bone name.
+				IMPORTANT: the setting can-collide-with-bone will override any configuration of can/no-collide-with-tag.
+				When you set this value, you are saying "collide with the bones I list, and literally nothing else".
+				It is useless to use no-collide-with-bone and can-collide-with-bone in the same shape.
+				If both are used, only can-collide-with-bone will be used. If none are used, collisions work.
+				Mnemotechnic tip: can > no.
+			</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-	<xsd:element name="can-collide-with-tag" type="xsd:string"/>
+	<xsd:element name="can-collide-with-tag" type="xsd:string">
+		<xsd:annotation>
+			<xsd:documentation>
+				It is useless to use no-collide-with-tag and can-collide-with-tag in the same shape.
+				If both are used, only can-collide-with-tag will be used. If none are used, collisions work.
+				Mnemotechnic tip: can > no.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="centerOfMassTransform" type="transform">
         <xsd:annotation>
             <xsd:documentation>
@@ -271,7 +304,16 @@ Allows to calculate, linearly between the minDistance and the maxDistance, the e
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="frameInA" type="transform"/>
-	<xsd:element name="frameInB" type="transform"/>
+	<xsd:element name="frameInB" type="transform">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to Identity (no rotation, no translation):
+basis x="0" y="0" z="0" w="1"
+origin x="0" y="0" z="0"
+			</xsd:documentation>
+		</xsd:annotation>
+
+	</xsd:element>
 	<xsd:element name="frameInLerp" type="lerp"/>
 	<xsd:element name="friction" type="xsd:float">
 		<xsd:annotation>
@@ -286,8 +328,10 @@ Recommended: best simulation results happen when friction is non-zero (from the 
 		<xsd:annotation>
 			<xsd:documentation>
 				Optional. Between 0 and 1. If undefined, it's set to 1.
-Will be applied to the gravity of the bone.
+Will be applied to the gravity of the bone. Has no effect on a static or kinematic object (so no effect if the bone mass is zero).
 Recommended: 1
+Generally, doubling the gravity or doubling the mass gives exactly the same result, so you should configure mass rather than on gravity.
+However, some functions (for example limitation of stiffness) use the mass without taking into account the gravity.
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
@@ -295,9 +339,10 @@ Recommended: 1
 	<xsd:element name="inertia" type="vector3">
 		<xsd:annotation>
 			<xsd:documentation>
-				Optional. Inverse factor.
+				Optional. Inverse factor. If undefined it's set to 0 (and no inertia is calculated).
 Local inertia is divided by this number, resulting in rather peculiar, extremely unphysicsy behaviour.
 Below one to increase, above one to decrease.
+When set to zero, the local insertia isn't considered infinite, but zero.
 Recommended (strongly!): 1
 			</xsd:documentation>
 		</xsd:annotation>
@@ -338,20 +383,33 @@ Strictly equivalent to the coneLimit and swingSpan1 parameters.
 	</xsd:element>
 	<xsd:element name="linearBounce" type="vector3">
         <xsd:annotation>
-            <xsd:documentation>Nope. Just don't.</xsd:documentation>
+            <xsd:documentation>
+				Nope. Just don't.
+				Optional. If undefined, it's set to (0.0, 0.0, 0.0).
+			</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 	<xsd:element name="linearDamping" type="factor">
 		<xsd:annotation>
-			<xsd:documentation>Optional. Between 0 and 1. If undefined, it's set to 0.
-On generic and stiffspring constraints, this is Hookean spring damping (good). On bones, this is a correction/adjustment (bad).
-Recommended (bones): 0
-Recommended (constraints): whatever damps your springs at the right rate.
-            </xsd:documentation>
+			<xsd:documentation>
+				Optional. Between 0 and 1. If undefined, it's set to 0.
+				On generic and stiffspring constraints, this is Hookean spring damping (good). On bones, this is a correction/adjustment (bad).
+				Recommended (bones): 0
+				Recommended (constraints): whatever damps your springs at the right rate.
+				On bones: bone_linearVelocity *= (1 - bone_linearDamping)^timeStep
+			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="linearEquilibrium" type="vector3"/>
-	<xsd:element name="linearLowerLimit" type="vector3"/>
+	<xsd:element name="linearLowerLimit" type="vector3">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to (1, 1, 1).
+				Isn't applied if linearLowerLimit > linearUpperLimit.
+				The displacement is limited to this value.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="linearNonHookeanDamping" type="vector3">
         <xsd:annotation>
             <xsd:documentation>
@@ -409,11 +467,23 @@ Motors must be enabled (linearMotors).
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="linearStiffness" type="vector3"/>
+	<xsd:element name="linearStiffness" type="vector3">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. Default (0, 0, 0).
+				Here is a simple way to define it: linear stiffness = mass * (angular frequency)^2 = mass * 4 * Pi^2 * (turns per second)^2
+				For example, if you have a mass of 1 kg, and you want it to oscillate along the x axis 2 times per second, you'll have:
+				(1 * 4 * Pi^2 * 2^2, , ) = (157.91, , )
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="linearStiffnessLimited" type="xsd:boolean">
         <xsd:annotation>
             <xsd:documentation>
-				FSMP 2.x: Optional. Completely removes the cap on frequency of calculations done for spring translation. linearStiffness may need to be adjusted (down, a lot).
+				FSMP 2.x: Optional. If undefined, it's set to true.
+				Limits the spring frequency to max 0.25 turns per timestep.
+				Honestly, you should set it to false and set your stiffness at the right level, because this limit is way too high:
+				when you attain it, the spring will oscillate around once every 4 frames, you will perceive incredible jittering!
 			</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -424,7 +494,15 @@ Motors must be enabled (linearMotors).
 			</xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-	<xsd:element name="linearUpperLimit" type="vector3"/>
+	<xsd:element name="linearUpperLimit" type="vector3">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional. If undefined, it's set to (-1, -1, -1).
+				Isn't applied if linearLowerLimit > linearUpperLimit.
+				The displacement is limited to this value. 
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="margin" type="posFloat">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -471,8 +549,24 @@ Setting mass to zero or unset creates a fixed (non-dynamic) rigid body.
 			<xsd:documentation>FSMP 2.x: Optional. Default 0.9. See ODE documentation for ERP/CFM.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="no-collide-with-bone" type="xsd:string"/>
-	<xsd:element name="no-collide-with-tag" type="xsd:string"/>
+	<xsd:element name="no-collide-with-bone" type="xsd:string">
+		<xsd:annotation>
+			<xsd:documentation>
+				It is useless to use no-collide-with-bone and can-collide-with-bone in the same shape.
+				If both are used, only can-collide-with-bone will be used. If none are used, collisions work.
+				Mnemotechnic tip: can > no.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="no-collide-with-tag" type="xsd:string">
+		<xsd:annotation>
+			<xsd:documentation>
+				It is useless to use no-collide-with-tag and can-collide-with-tag in the same shape.
+				If both are used, only can-collide-with-tag will be used. If none are used, collisions work.
+				Mnemotechnic tip: can > no.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:element name="penetration">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -553,7 +647,7 @@ Strictly equivalent to the limitY and swingSpan2 parameters.
 	</xsd:element>
 	<xsd:element name="stopERP" type="factor">
 		<xsd:annotation>
-			<xsd:documentation>FSMP 2.x: Optional. Default 0.2. See ODE documentation for ERP/CFM.</xsd:documentation>
+			<xsd:documentation>FSMP 2.x: Optional. Default 0.2. See ODE documentation for ERP/CFM. http://ode.org/wiki/index.php/Manual#Joint_error_and_the_Error_Reduction_Parameter_.28ERP.29</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="swingSpan1" type="posFloat">
@@ -659,8 +753,8 @@ Currently unused.
 		<xsd:annotation>
 			<xsd:documentation>
 				Bones can be used in constraints tags, can-collide-with-bone tags and no-collide-with-bone tags without being declared in a bone tag.
-If a node with that name exists, a bone will be created on the fly with the current bone-default values.
-Beware: bones can be created only once; the second declaration won't be taken into account, and will issue a warning in hdtSMP64.log saying that the bone is skipped.
+				If a node with that name exists, a bone will be created on the fly with the current bone-default values.
+				Beware: bones can be created only once; the second declaration won't be taken into account, and will issue a warning in hdtSMP64.log saying that the bone is skipped.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -818,8 +912,9 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 				<xsd:element ref="stopCFM"/>
 				<xsd:element ref="motorERP"/>
 				<xsd:element ref="motorCFM"/>
+				<xsd:element ref="springDampingLimited"/>
 				<!-- linear and angular damping are already declared as floats for bones -->
-				<!-- Yes, but they're crap and bad.  This is spring damping. -->
+				<!-- Yes, but they're crap and bad. This is spring damping. -->
 				<xsd:element name="linearDamping" type="vector3"/>
 				<xsd:element name="angularDamping" type="vector3"/>
 			</xsd:choice>
@@ -879,6 +974,7 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 				<xsd:element ref="stopCFM"/>
 				<xsd:element ref="motorERP"/>
 				<xsd:element ref="motorCFM"/>
+				<xsd:element ref="springDampingLimited"/>
 				<!-- linear and angular damping are already declared as floats for bones -->
                 <!-- Yes, but they're crap and bad.  This is spring damping. -->
 				<xsd:element name="angularDamping" type="vector3"/>
@@ -1126,6 +1222,15 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 				<xsd:attribute name="x" type="xsd:float" use="required"/>
 				<xsd:attribute name="y" type="xsd:float" use="required"/>
 				<xsd:attribute name="z" type="xsd:float" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="limitedVector3">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="x" type="factor" use="required"/>
+				<xsd:attribute name="y" type="factor" use="required"/>
+				<xsd:attribute name="z" type="factor" use="required"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
