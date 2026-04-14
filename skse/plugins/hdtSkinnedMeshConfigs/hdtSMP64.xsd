@@ -336,10 +336,10 @@ However, some functions (for example limitation of stiffness) use the mass witho
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="wind-factor" type="factor">
+	<xsd:element name="wind-factor" type="posFloat">
 		<xsd:annotation>
 			<xsd:documentation>
-				Optional. Between 0 and 1. If undefined, it's set to 1.
+				Optional. Positive. If undefined, it's set to 1.
 Will be applied to the wind effect on the bone. Has no effect on a static or kinematic object (so no effect if the bone mass is zero).
 Recommended: 1
 			</xsd:documentation>
@@ -725,14 +725,6 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 			</xsd:simpleContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:element name="wind-effect" type="xsd:float">
-		<xsd:annotation>
-			<xsd:documentation>
-				Optional. If undefined, it's set to 0.
-Currently unused.
-			</xsd:documentation>
-		</xsd:annotation>
-	</xsd:element>
 
 	<!-- ############################################################ -->
 	<!-- Complex elements -->
@@ -1010,7 +1002,6 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 				<xsd:element ref="weight-threshold"/>
 				<xsd:element ref="disable-tag"/>
 				<xsd:element ref="disable-priority"/>
-				<xsd:element ref="wind-effect"/>
 			</xsd:choice>
 			<xsd:attribute name="name" type="xsd:string" use="required"/>
 		</xsd:complexType>
@@ -1033,7 +1024,6 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 				<xsd:element ref="weight-threshold"/>
 				<xsd:element ref="disable-tag"/>
 				<xsd:element ref="disable-priority"/>
-				<xsd:element ref="wind-effect"/>
 			</xsd:choice>
 			<xsd:attribute name="name" type="xsd:string" use="required"/>
 		</xsd:complexType>
