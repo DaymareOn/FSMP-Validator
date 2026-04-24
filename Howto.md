@@ -8,13 +8,60 @@ This manual provides a comprehensive protocol for transforming static Skyrim obj
 
 The transition from the legacy **HDT Physics Extension (HDT-PE)** to **HDT-SMP** marked a shift from the integrated Havok engine to the open-source **Bullet Physics** engine. Unlike Havok, which Bethesda restricted to basic environmental collisions, Bullet allows for complex, real-time deformation of cloth, hair, and soft bodies. **Faster HDT-SMP** further optimizes this by introducing multithreading and Advanced Vector Extensions (AVX), distributing the physics load across multiple CPU cores rather than bottlenecking a single thread.
 
-#### Required Toolkit
+#### Required Toolkit — Sequential Workflow
 
-1. **Blender (Version 3.6 or 4.0 recommended):** The primary 3D modeling environment.
-2. **PyNIFly Plugin:** The modern standard for importing and exporting .NIF files directly in Blender without the bugs of older NifTools scripts.
-3. **Outfit Studio:** Essential for "conforming" meshes to different body types and copying bone weights.
-4. **NifSkope (Version 2.0 Pre-Alpha 3):** Used for editing metadata and linking the mesh to the physics logic.
-5. **XP32 Maximum Skeleton Extended (XPMSSE):** This skeleton must serve as your reference. It contains the specific nodes required by the physics engine to calculate collisions.
+Each tool occupies a distinct, ordered step in the authoring pipeline. The diagram below shows which files flow between tools and where the physics XML fits in:
+
+```mermaid
+flowchart TD
+    XPMSSE["📦 XPMSSE Skeleton\n(bone name reference)"]
+    A["🎨 Step 1 — Blender + PyNIFly Plugin\nModel mesh · Paint weights · Export NIF"]
+    B["👗 Step 2 — Outfit Studio\nConform to body type · Refine skin weights"]
+    C["🔍 Step 3 — NifSkope\nInject NiStringExtraData (XML path) · Inspect block names"]
+    D["📝 Step 4 — Text / XML Editor\nAuthor physics rules (bones, constraints, shapes)"]
+
+    NIF1["armor.nif\nBSTriShape geometry\nNiSkinData / NiSkinPartition\n(bone weight maps)"]
+    NIF2["armor.nif\n(body-conformed vertices\n+ refined skin weights)"]
+    NIF3["armor.nif\n+ NiStringExtraData\n→ physics.xml path"]
+    XML["physics.xml\n⟨system⟩ · ⟨bone⟩ · ⟨constraint⟩\n⟨per-vertex-shape⟩"]
+
+    XPMSSE -- "bone names\nfor rigging" --> A
+    XPMSSE -- "bone names\nfor XML authoring" --> D
+    A -- "exports" --> NIF1
+    NIF1 --> B
+    B -- "rewrites\nNiSkinData" --> NIF2
+    NIF2 --> C
+    C -- "inserts\nNiStringExtraData" --> NIF3
+    D -- "authors" --> XML
+    NIF3 -. "path in\nString Data field" .-> XML
+```
+
+#### Tool Descriptions
+
+1. **Blender (Version 3.6 or 4.0 recommended)**
+
+   - **Files created / edited:** Your source `.blend` project, and via the PyNIFly export pipeline, the output `armor.nif`. Inside the NIF, Blender populates `BSTriShape` nodes (mesh geometry, UV maps, normals) and creates the `NiSkinInstance` / `NiSkinData` / `NiSkinPartition` blocks that record which skeleton bones each vertex is weighted to and by how much.
+   - **What it brings to the process:** This is the foundational authoring step. Blender is where the visual mesh is modeled, the low-poly proxy collision mesh is built, and every vertex is painted with bone weights. The quality of the weight painting here determines whether the physics simulation will deform the mesh correctly or produce stretching, tearing, and melting artefacts in-game.
+
+2. **PyNIFly Plugin**
+
+   - **Files created / edited:** Acts as Blender's NIF import/export bridge, directly reading and writing `BSTriShape`, `NiSkinData`, and `NiSkinPartition` blocks in `armor.nif` without corrupting bone weight indices or bone-to-vertex mappings — a known failure mode of older NifTools exporters.
+   - **What it brings to the process:** Reliable round-tripping between the `.blend` working file and the binary `.nif` format. Without PyNIFly, bone weight indices stored in `NiSkinPartition` are routinely remapped incorrectly on export, producing meshes whose skin data references the wrong skeleton nodes — leading to physics failures or broken deformation that is invisible until in-game testing.
+
+3. **Outfit Studio**
+
+   - **Files created / edited:** The `armor.nif` produced by Blender. Outfit Studio rewrites the `NiSkinData` per-bone bind transforms and bounding spheres, and the `NiSkinPartition` per-vertex bone index + weight arrays, to conform the mesh to a specific body preset morph. It can also copy weight maps directly from a reference body NIF.
+   - **What it brings to the process:** Body-type compatibility. A mesh exported from Blender is rigged to the neutral reference pose and will clip or gap when worn over a body that has been morphed to a different preset (CBBE, 3BA, BHUNP, etc.). Outfit Studio conforms the vertex positions to the target body shape and transfers production-quality skin weights from the body mesh to the armor where appropriate, ensuring the final NIF will deform correctly across body presets.
+
+4. **NifSkope (Version 2.0 Pre-Alpha 3)**
+
+   - **Files created / edited:** The `armor.nif`. NifSkope adds a `NiStringExtraData` block to the Scene Root NiNode's **Extra Data List**. The block's **Name** field must be set to exactly `HDT Skinned Mesh Physics Object` (case-sensitive) and its **String Data** field to the Skyrim-root-relative path of the physics XML (e.g. `SKSE\Plugins\hdtSkinnedMeshConfigs\MyMod.xml`). NifSkope also exposes the internal names of `BSTriShape` nodes so you can verify they match the `name` attributes used in your XML.
+   - **What it brings to the process:** The critical NIF↔XML link (see Phase 5, Link 1). Without this block, FSMP cannot find the physics XML for this armor and falls back to the `defaultBBPs.xml` name-matching mechanism. NifSkope is also the primary inspection tool for confirming that mesh node names, bone references, and Extra Data block indices are all correctly structured before the mod is packaged.
+
+5. **XP32 Maximum Skeleton Extended (XPMSSE)**
+
+   - **Files provided:** A set of skeleton NIF files installed to `meshes\actors\character\character assets\skeleton.nif` (and related actor paths). Each file contains a tree of `NiNode` objects whose `.name` fields define the canonical bone name vocabulary that every Skyrim physics mod must use.
+   - **What it brings to the process:** A shared bone name contract between the NIF and the XML. The `<bone name="...">` attributes in your physics XML and the bone weight maps baked into `NiSkinData` by Blender must both reference names that exist in the active skeleton at runtime. XPMSSE is the de-facto standard physics skeleton for Skyrim SE and provides the additional nodes beyond the vanilla Bethesda skeleton — breast, belly, butt, hair chain, and cloak bones — that FSMP requires to simulate cloth and soft-body physics.
 
 ---
 
