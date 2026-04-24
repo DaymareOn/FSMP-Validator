@@ -55,7 +55,7 @@ The XML file is the brain of the simulation. It defines how the object responds 
 
 - **`<mass>`:** Sets the "weight" of the bone. An anchor bone must be 0.
 
-- **`<inertia>`:** An inverse scale factor applied to the bone's local inertia tensor. The default is 0, which skips inertia calculation entirely. **Strongly recommended: set to 1** for physically realistic behaviour. Values below 1 increase the effective inertia; values above 1 decrease it. Setting it to 0 does not crash the simulation — it simply omits the inertia contribution.
+- **`<inertia>`:** An inverse scale factor applied to the bone's local inertia tensor. The default is 0, which skips inertia calculation entirely. **Strongly recommended: set to 1** for physically realistic behavior. Values below 1 increase the effective inertia; values above 1 decrease it. Setting it to 0 does not crash the simulation — it simply omits the inertia contribution.
 
 - **`<linearDamping>` and `<angularDamping>`:** Damping coefficients between 0 and 1 that dissipate kinetic energy each physics step. Both default to **0**. `linearDamping` on bones is a blunt per-step velocity reduction and is recommended to remain at 0 on bones; it is more useful when applied to constraints. `angularDamping` reduces rotational velocity using the formula `angularVelocity *= pow(1 - angularDamping, timeStep)`. Tune these values carefully to reduce bouncing and jitter without over-damping the motion.
 
@@ -219,7 +219,7 @@ Faster HDT-SMP provides advanced software-level optimizations to maintain fluidi
 The FSMP plugin is compiled in different versions. Choose the one that matches your CPU's capabilities:
 
 - **AVX2:** Standard for Intel Haswell/AMD Ryzen and newer. Provides a major performance boost.
-- **AVX512:** Performance peak for modern high-end processors (AMD Ryzen 7000 series, Intel Sapphire Rapids/Alder Lake and newer).
+- **AVX512:** Performance peak for modern high-end processors (AMD Ryzen 7000 series, Intel Sapphire Rapids and newer).
 - **CUDA:** Currently in development, it offloads collision math to the GPU. It is most effective on systems with many actors and a powerful NVIDIA card, but may be less stable than CPU-based simulation.
 
 #### Culling and Distance Management
