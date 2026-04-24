@@ -41,7 +41,7 @@ flowchart TD
 1. **Blender (Version 3.6 or 4.0 recommended)**
 
    - **Files created / edited:** Your source `.blend` project, and via the PyNIFly export pipeline, the output `armor.nif`. Inside the NIF, Blender populates `BSTriShape` nodes (mesh geometry, UV maps, normals) and creates the `NiSkinInstance` / `NiSkinData` / `NiSkinPartition` blocks that record which skeleton bones each vertex is weighted to and by how much.
-   - **What it brings to the process:** This is the foundational authoring step. Blender is where the visual mesh is modeled, the low-poly proxy collision mesh is built, and every vertex is painted with bone weights. The quality of the weight painting here determines whether the physics simulation will deform the mesh correctly or produce stretching, tearing, and melting artefacts in-game.
+   - **What it brings to the process:** This is the foundational authoring step. Blender is where the visual mesh is modeled, the low-poly proxy collision mesh is built, and every vertex is painted with bone weights. The quality of the weight painting here determines whether the physics simulation will deform the mesh correctly or produce stretching, tearing, and melting artifacts in-game.
 
 2. **PyNIFly Plugin**
 
