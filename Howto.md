@@ -94,7 +94,7 @@ Faster HDT-SMP provides advanced software-level optimizations to maintain fluidi
 The FSMP plugin is compiled in different versions. Choose the one that matches your CPU's capabilities:
 
 - **AVX2:** Standard for Intel Haswell/AMD Ryzen and newer. Provides a major performance boost.
-- **AVX512:** Performance peak for modern high-end processors (Ryzen 7000/Intel Skylake-X).
+- **AVX512:** Performance peak for modern high-end processors (AMD Ryzen 7000 series, Intel Sapphire Rapids/Alder Lake and newer).
 - **CUDA:** Currently in development, it offloads collision math to the GPU. It is most effective on systems with many actors and a powerful NVIDIA card, but may be less stable than CPU-based simulation.
 
 #### Culling and Distance Management
