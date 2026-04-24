@@ -73,15 +73,140 @@ Constraints limit how far bones can twist or stretch.
 
 ---
 
-### Phase 5: NIF Implementation and Metadata
+### Phase 5: How FSMP Links the NIF to the XML
 
-Once the NIF and XML are ready, they must be linked. Skyrim does not automatically recognize the XML file; you must embed the path within the NIF.
+FSMP establishes the link between a NIF file and its physics XML through several distinct mechanisms, which are executed in sequence by the engine at runtime. Understanding all of them is essential for both authoring and debugging.
 
-1. **Open the NIF in NifSkope.**
-2. **Insert the Metadata Block:** Right-click the **Scene Root**, select `Block > Insert`, and choose **NiStringExtraData**.
-3. **Name the Block:** The name must be exactly **HDT Skinned Mesh Physics Object** (case-sensitive).
-4. **Set the Path:** In the `String Data` field, enter the relative path to your XML (e.g., `SKSE\Plugins\hdtSkinnedMeshConfigs\MyMod.xml`).
-5. **Reference the Node:** Ensure the `NiStringExtraData` block number is added to the **Extra Data List** of the Scene Root NiNode.
+#### Link 1 — The primary trigger: `NiStringExtraData` embedded in the NIF
+
+The first thing FSMP does when a piece of armor is equipped is scan every block in the NIF's **Extra Data List** for a `NiStringExtraData` entry whose **Name** field is exactly:
+
+```
+HDT Skinned Mesh Physics Object
+```
+
+(case-sensitive, checked in `hdtDefaultBBP.cpp → DefaultBBP::scanBBP`).
+
+If such a block is found and its **String Data** value is non-empty, that value is used verbatim as the file path to the physics XML. The path is relative to the Skyrim root directory, so it typically looks like:
+
+```
+SKSE\Plugins\hdtSkinnedMeshConfigs\MyMod.xml
+```
+
+**How to set it up in NifSkope:**
+
+1. Open the NIF and right-click the **Scene Root** NiNode → `Block > Insert` → choose `NiStringExtraData`.
+2. Set the **Name** field to exactly `HDT Skinned Mesh Physics Object`.
+3. Set the **String Data** field to the path of your XML file.
+4. Make sure the new block's index appears in the **Extra Data List** of the Scene Root NiNode.
+
+> ⚠️ If the `NiStringExtraData` block exists but has an empty `String Data` value, FSMP falls through to the fallback mechanism described next. It does **not** silently use any previously loaded XML.
+
+#### Link 2 — The fallback: `defaultBBPs.xml` shape-name matching
+
+If no `NiStringExtraData` block is found (or it has an empty value), FSMP falls back to `defaultBBPs.xml` (`SKSE\Plugins\hdtSkinnedMeshConfigs\defaultBBPs.xml`). This file maps **NIF mesh names** to XML files:
+
+```xml
+<map shape="SomeMeshName" file="SKSE\Plugins\hdtSkinnedMeshConfigs\SomeFile.xml"/>
+```
+
+FSMP collects the names of all direct `BSTriShape` children of the armor node, then checks whether any of those names appear as a `shape` attribute in `defaultBBPs.xml`. The first match wins and provides the XML path. This mechanism allows physics to be applied to a NIF without modifying it at all — useful for vanilla meshes or meshes from mods you do not control.
+
+The `defaultBBPs.xml` also supports `<remap>` entries, which allow one canonical shape name to be resolved from several alternative actual mesh names with priority ordering.
+
+#### Link 3 — The XML root: the `<system>` element
+
+Once FSMP has a file path, it reads the XML and immediately checks that the root element is `<system>`. If the root has any other name, the file is rejected entirely and no physics is created. Every physics XML file must therefore look like:
+
+```xml
+<system>
+  <!-- bone and shape definitions go here -->
+</system>
+```
+
+#### Link 4 — `<bone name="...">` → NIF skeleton node lookup
+
+Inside `<system>`, each `<bone>` element has a **`name` attribute**. This name is used to look up a node in the **NPC skeleton** (not the armor NIF) by calling `findNode(skeleton, name)`. The match must be **exact and case-sensitive**.
+
+```xml
+<bone name="NPC Spine1 [Spn1]">
+  <mass>0</mass>
+</bone>
+```
+
+If no skeleton node with that name exists, the bone is skipped with a warning and no rigid body is created. This means every bone name in your XML must correspond to an actual node name in the XPMSSE skeleton (or a custom skeleton your mod requires).
+
+When an armor is equipped, FSMP merges the armor's bone nodes into the NPC skeleton under a unique prefix to avoid collisions between multiple equipped items. A **rename map** is passed to the XML parser so that bone name lookups are automatically adjusted to the prefixed names. You never need to embed the prefix in the XML — it is invisible at authoring time.
+
+#### Link 5 — `<per-vertex-shape name="...">` / `<per-triangle-shape name="...">` → NIF mesh lookup
+
+These elements define a collision body by reading vertex and triangle data directly from the NIF. The **`name` attribute** is used to look up a `BSTriShape` node inside the **armor NIF model** (not the skeleton) by calling `findObject(armorModel, name)`.
+
+```xml
+<per-vertex-shape name="SomeMeshName">
+  <margin>1</margin>
+</per-vertex-shape>
+```
+
+The name must match the internal name of a `BSTriShape` node in your NIF file exactly. If no such mesh is found, the shape is silently skipped and no collision body is created for it.
+
+If `defaultBBPs.xml` remapping is in effect (Link 2), the name is first looked up in the remap table; if found, the set of actual NIF mesh names it maps to is used instead of the literal name. This allows one `<per-vertex-shape>` to aggregate geometry from several NIF meshes into a single collision body.
+
+#### Link 6 — Implicit bone creation from `NiSkinData` (vertex bone weights)
+
+When FSMP processes a collision shape (Link 5), it reads the mesh's **`NiSkinData`** and **`NiSkinPartition`** blocks to extract vertex positions and per-vertex bone weights. For each bone referenced in `NiSkinData`, FSMP looks up whether a `<bone>` with that name was already declared in the XML (Link 4).
+
+If a bone referenced by the skin data was **not** declared in the XML, FSMP automatically creates it with default physics parameters (kinematic, no collision shape). This means your XML only needs to declare bones whose physics parameters you want to customise. All other bones that the mesh is weighted to are implicitly created and treated as pass-through kinematic anchors.
+
+#### Link 7 — Constraint bone references: `bodyA` / `bodyB` attributes
+
+Constraints (generic, stiffspring, conetwist) connect two bones by name using `bodyA` and `bodyB` attributes:
+
+```xml
+<generic-constraint bodyA="NPC Spine1 [Spn1]" bodyB="NPC Spine2 [Spn2]">
+  ...
+</generic-constraint>
+```
+
+FSMP resolves each name against the set of bones already created (either explicitly via `<bone>` or implicitly via skin data). If a name cannot be resolved and cannot be auto-created from the skeleton, the constraint is skipped. Constraints between two kinematic bones are also silently discarded, since neither can move.
+
+#### Link 8 — Collision filtering: `can-collide-with-bone` / `no-collide-with-bone`
+
+Inside both `<bone>` and `<per-vertex-shape>` / `<per-triangle-shape>`, FSMP supports per-body collision filtering by bone name:
+
+```xml
+<per-vertex-shape name="SkirtFront">
+  <no-collide-with-bone>NPC L Thigh [LThg]</no-collide-with-bone>
+  <can-collide-with-bone>NPC Pelvis [Pelv]</can-collide-with-bone>
+</per-vertex-shape>
+```
+
+These strings are resolved at parse time through the same name-lookup mechanism as constraints (Link 7). Any bone name referenced here must be a valid NIF skeleton node or must have already been declared as a `<bone>` element earlier in the XML.
+
+#### Summary diagram
+
+```
+NIF File                            XML File
+─────────────────────────────────   ──────────────────────────────────────
+NiStringExtraData                   <system>
+  Name = "HDT Skinned Mesh          │
+          Physics Object"   ──────► │  <bone name="...">  ──► NIF skeleton node (by name)
+  String Data = "path/to/xml"       │  </bone>
+                                    │
+BSTriShape "SomeName"      ◄─────── │  <per-vertex-shape name="SomeName">
+  NiSkinData                        │    <no-collide-with-bone>...</no-collide-with-bone>
+    bone[0] = "NPC Spine1..." ─────►│  </per-vertex-shape>
+    bone[1] = "NPC L Thigh..." ────►│
+                                    │  <generic-constraint
+                                    │    bodyA="NPC Spine1..."  ──► declared/implicit bone
+                                    │    bodyB="NPC Spine2..."> ──► declared/implicit bone
+                                    │  </generic-constraint>
+                                    │</system>
+                                    │
+defaultBBPs.xml (fallback)          │
+  <map shape="SomeName"    ────────►│
+       file="path/to/xml"/>
+```
 
 ---
 
