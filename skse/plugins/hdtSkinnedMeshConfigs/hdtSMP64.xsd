@@ -732,6 +732,9 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 
 	<xsd:element name="bone-default">
 		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation>When mass is set to 0, inertia, linearDamping and angularDamping are forbidden: they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
+			</xsd:annotation>
 			<xsd:all>
 				<xsd:element ref="mass" minOccurs="0"/>
 				<xsd:element ref="inertia" minOccurs="0"/>
