@@ -2,13 +2,11 @@
 
 <xsd:schema
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
 	xmlns="FSMP-Validator"
 	targetNamespace="FSMP-Validator"
 	elementFormDefault="qualified"
     attributeFormDefault="unqualified"
 	version="2.1.0"
-	vc:minVersion="1.1"
 	>
 
 	<!-- ############################################################ -->
@@ -734,6 +732,9 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 
 	<xsd:element name="bone-default">
 		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation>When mass is set to 0, inertia, linearDamping and angularDamping must not be used: they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
+			</xsd:annotation>
 			<xsd:all>
 				<xsd:element ref="mass" minOccurs="0"/>
 				<xsd:element ref="inertia" minOccurs="0"/>
@@ -752,11 +753,6 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 				<xsd:element ref="no-collide-with-bone" minOccurs="0"/>
 			</xsd:all>
 			<xsd:attributeGroup ref="defaults" />
-			<xsd:assert test="not(mass[number(.) = 0]) or (not(inertia) and not(linearDamping) and not(angularDamping))">
-				<xsd:annotation>
-					<xsd:documentation>When mass is 0, inertia, linearDamping and angularDamping are forbidden because they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:assert>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="bone">
@@ -768,6 +764,9 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation>When mass is set to 0, inertia, linearDamping and angularDamping must not be used: they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
+			</xsd:annotation>
 			<xsd:all>
 				<xsd:element ref="mass" minOccurs="0"/>
 				<xsd:element ref="inertia" minOccurs="0"/>
@@ -787,11 +786,6 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 			</xsd:all>
 			<xsd:attribute name="name" type="xsd:string" use="required"/>
 			<xsd:attribute name="template" type="xsd:string"/>
-			<xsd:assert test="not(mass[number(.) = 0]) or (not(inertia) and not(linearDamping) and not(angularDamping))">
-				<xsd:annotation>
-					<xsd:documentation>When mass is 0, inertia, linearDamping and angularDamping are forbidden because they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:assert>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="child">
