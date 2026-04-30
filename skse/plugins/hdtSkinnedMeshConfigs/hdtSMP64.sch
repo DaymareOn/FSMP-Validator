@@ -7,15 +7,15 @@
 		<sch:title>Static rigid body constraints (mass=0)</sch:title>
 
 		<sch:rule context="bone-default[mass = '0']">
-			<sch:report test="inertia">inertia has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-			<sch:report test="linearDamping">linearDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-			<sch:report test="angularDamping">angularDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
+			<sch:assert test="not(inertia)" role="error">inertia has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:assert>
+			<sch:assert test="not(linearDamping)" role="error">linearDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:assert>
+			<sch:assert test="not(angularDamping)" role="error">angularDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:assert>
 		</sch:rule>
 
 		<sch:rule context="bone[mass = '0']">
-			<sch:report test="inertia">inertia has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-			<sch:report test="linearDamping">linearDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-			<sch:report test="angularDamping">angularDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
+			<sch:assert test="not(inertia)" role="error">inertia has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:assert>
+			<sch:assert test="not(linearDamping)" role="error">linearDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:assert>
+			<sch:assert test="not(angularDamping)" role="error">angularDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:assert>
 		</sch:rule>
 	</sch:pattern>
 
