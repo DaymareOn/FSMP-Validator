@@ -3,7 +3,6 @@
 <xsd:schema
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns="FSMP-Validator"
-	xmlns:sch="http://purl.oclc.org/dsdl/schematron"
 	targetNamespace="FSMP-Validator"
 	elementFormDefault="qualified"
     attributeFormDefault="unqualified"
@@ -735,15 +734,6 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 		<xsd:complexType>
 			<xsd:annotation>
 				<xsd:documentation>When mass is set to 0, inertia, linearDamping and angularDamping are forbidden: they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
-				<xsd:appinfo>
-					<sch:pattern>
-						<sch:rule context="bone-default[mass = '0']">
-							<sch:report test="inertia">inertia has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-							<sch:report test="linearDamping">linearDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-							<sch:report test="angularDamping">angularDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-						</sch:rule>
-					</sch:pattern>
-				</xsd:appinfo>
 			</xsd:annotation>
 			<xsd:all>
 				<xsd:element ref="mass" minOccurs="0"/>
@@ -772,15 +762,6 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 				If a node with that name exists, a bone will be created on the fly with the current bone-default values.
 				Beware: bones can be created only once; the second declaration won't be taken into account, and will issue a warning in hdtSMP64.log saying that the bone is skipped.
 			</xsd:documentation>
-			<xsd:appinfo>
-				<sch:pattern>
-					<sch:rule context="bone[mass = '0']">
-						<sch:report test="inertia">inertia has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-						<sch:report test="linearDamping">linearDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-						<sch:report test="angularDamping">angularDamping has no effect on a static rigid body (mass=0) and must not be used when mass is 0.</sch:report>
-					</sch:rule>
-				</sch:pattern>
-			</xsd:appinfo>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:all>
