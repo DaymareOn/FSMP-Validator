@@ -7,6 +7,7 @@
 	elementFormDefault="qualified"
     attributeFormDefault="unqualified"
 	version="2.1.0"
+	xpathDefaultNamespace="##targetNamespace"
 	>
 
 	<!-- ############################################################ -->
@@ -733,7 +734,7 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 	<xsd:element name="bone-default">
 		<xsd:complexType>
 			<xsd:annotation>
-				<xsd:documentation>When mass is set to 0, inertia, linearDamping and angularDamping must not be used: they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
+				<xsd:documentation>When mass is set to 0, inertia, linearDamping and angularDamping are forbidden: they have no effect on a static (non-dynamic) rigid body.</xsd:documentation>
 			</xsd:annotation>
 			<xsd:all>
 				<xsd:element ref="mass" minOccurs="0"/>
@@ -752,6 +753,8 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 				<xsd:element ref="can-collide-with-bone" minOccurs="0"/>
 				<xsd:element ref="no-collide-with-bone" minOccurs="0"/>
 			</xsd:all>
+			<xsd:assert test="not(mass = 0) or (not(inertia) and not(linearDamping) and not(angularDamping))"
+				message="inertia, linearDamping and angularDamping have no effect on a static rigid body (mass=0) and must not be used when mass is 0."/>
 			<xsd:attributeGroup ref="defaults" />
 		</xsd:complexType>
 	</xsd:element>
@@ -766,7 +769,10 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 		<xsd:complexType>
 			<xsd:all>
 				<xsd:element ref="mass" minOccurs="0"/>
+				<xsd:element ref="inertia" minOccurs="0"/>
 				<xsd:element ref="centerOfMassTransform" minOccurs="0"/>
+				<xsd:element ref="linearDamping" minOccurs="0"/>
+				<xsd:element ref="angularDamping" minOccurs="0"/>
 				<xsd:element ref="gravity-factor" minOccurs="0"/>
 				<xsd:element ref="wind-factor" minOccurs="0"/>
 				<xsd:element ref="friction" minOccurs="0"/>
@@ -778,6 +784,8 @@ If true, the constraint will be set between BodyB, BodyA, FrameB, FrameA.
 				<xsd:element ref="can-collide-with-bone" minOccurs="0"/>
 				<xsd:element ref="no-collide-with-bone" minOccurs="0"/>
 			</xsd:all>
+			<xsd:assert test="not(mass = 0) or (not(inertia) and not(linearDamping) and not(angularDamping))"
+				message="inertia, linearDamping and angularDamping have no effect on a static rigid body (mass=0) and must not be used when mass is 0."/>
 			<xsd:attribute name="name" type="xsd:string" use="required"/>
 			<xsd:attribute name="template" type="xsd:string"/>
 		</xsd:complexType>
