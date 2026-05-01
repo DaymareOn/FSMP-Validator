@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="hdtSMP64.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<?xml-model href="hdtSMP64.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<system xmlns="FSMP-Validator">
+
+	<!-- Default properties for dynamic bones -->
+	<bone-default>
+		<mass>1</mass>
+		<inertia x="1" y="1" z="1"/>
+		<linearDamping>0.02</linearDamping>
+		<angularDamping>0.02</angularDamping>
+	</bone-default>
+
+	<!-- Dynamic bone 1 -->
+	<bone name="SkirtBone01">
+		<mass>1</mass>
+		<inertia x="1" y="1" z="1"/>
+		<shape type="capsule">
+			<radius>5</radius>
+			<height>8</height>
+		</shape>
+	</bone>
+
+	<!-- Dynamic bone 2 -->
+	<bone name="SkirtBone02">
+		<mass>1</mass>
+		<inertia x="1" y="1" z="1"/>
+		<shape type="capsule">
+			<radius>5</radius>
+			<height>8</height>
+		</shape>
+	</bone>
+
+	<!-- Dynamic bone 3 -->
+	<bone name="SkirtBone03">
+		<mass>1</mass>
+		<inertia x="1" y="1" z="1"/>
+		<shape type="capsule">
+			<radius>5</radius>
+			<height>8</height>
+		</shape>
+	</bone>
+
+	<!-- Dynamic bone 4 -->
+	<bone name="SkirtBone04">
+		<mass>1</mass>
+		<inertia x="1" y="1" z="1"/>
+		<shape type="capsule">
+			<radius>5</radius>
+			<height>8</height>
+		</shape>
+	</bone>
+
+	<!-- Dynamic bone 5 -->
+	<bone name="SkirtBone05">
+		<mass>1</mass>
+		<inertia x="1" y="1" z="1"/>
+		<shape type="capsule">
+			<radius>5</radius>
+			<height>8</height>
+		</shape>
+	</bone>
+
+	<!-- Dynamic bone 6 -->
+	<bone name="SkirtBone06">
+		<mass>1</mass>
+		<inertia x="1" y="1" z="1"/>
+		<shape type="capsule">
+			<radius>5</radius>
+			<height>8</height>
+		</shape>
+	</bone>
+	<!-- ERROR: This attachment bone (mass=0) incorrectly uses inertia. -->
+	<bone name="Pelvis">
+		<mass>0</mass>
+		<inertia x="1" y="1" z="1"/>
+	</bone>
+
+</system>
