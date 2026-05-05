@@ -35,10 +35,10 @@
 			<sch:assert test="false()" role="warning">inertia has no effect on a static rigid body (mass=0).</sch:assert>
 		</sch:rule>
 		<sch:rule context="f:linearDamping[parent::f:bone-default[f:mass = '0'] or parent::f:bone[f:mass = '0']]">
-			<sch:assert test="false()" role="error">linearDamping has no effect on a static rigid body (mass=0).</sch:assert>
+			<sch:assert test="false()" role="warning">linearDamping has no effect on a static rigid body (mass=0).</sch:assert>
 		</sch:rule>
 		<sch:rule context="f:angularDamping[parent::f:bone-default[f:mass = '0'] or parent::f:bone[f:mass = '0']]">
-			<sch:assert test="false()" role="error">angularDamping has no effect on a static rigid body (mass=0).</sch:assert>
+			<sch:assert test="false()" role="warning">angularDamping has no effect on a static rigid body (mass=0).</sch:assert>
 		</sch:rule>
 	</sch:pattern>
 
@@ -126,7 +126,7 @@
 		<!-- #### conetwist-constraint and conetwist-constraint-default #### -->
 
 		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:angularOnly[normalize-space(.) = 'false' or normalize-space(.) = '0']">
-			<sch:assert test="false()" role="warning">angularOnly is set to its default value (false). This tag is unnecessary and can be removed. Note: angularOnly has no effect regardless of its value (see invalid-physics-semantics pattern).</sch:assert>
+			<sch:assert test="false()" role="warning">angularOnly is set to its default value (false). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
 		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:biasFactor[number(.) = 0.3]">
 			<sch:assert test="false()" role="warning">biasFactor is set to its default value (0.3). This tag is unnecessary and can be removed.</sch:assert>
