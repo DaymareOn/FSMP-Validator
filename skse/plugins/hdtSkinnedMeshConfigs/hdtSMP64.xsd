@@ -554,15 +554,10 @@ Setting mass to zero or unset creates a fixed (non-dynamic) rigid body.
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="motorCFM">
+	<xsd:element name="motorCFM" type="posFloat">
 		<xsd:annotation>
 			<xsd:documentation>FSMP 2.x: Optional. Non-negative. Default 0. Soft constraints are made with this. See ODE documentation for ERP/CFM.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:simpleType>
-			<xsd:restriction base="xsd:float">
-				<xsd:minInclusive value="0"/>
-			</xsd:restriction>
-		</xsd:simpleType>
 	</xsd:element>
 	<xsd:element name="motorERP" type="factor">
 		<xsd:annotation>
@@ -619,23 +614,15 @@ Strictly equivalent to the limitY and swingSpan2 parameters.
 			<xsd:documentation>Optional. Between 0 and 1. If undefined, it's set to 1.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="restitution">
+	<xsd:element name="restitution" type="xsd:float">
 		<xsd:annotation>
 			<xsd:documentation>Optional. If undefined, it's set to 0.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:simpleType>
-			<xsd:restriction base="xsd:float"/>
-		</xsd:simpleType>
 	</xsd:element>
-	<xsd:element name="rollingFriction">
+	<xsd:element name="rollingFriction" type="posFloat">
 		<xsd:annotation>
 			<xsd:documentation>Optional. Positive. If undefined, it's set to 0.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:simpleType>
-			<xsd:restriction base="xsd:float">
-				<xsd:minInclusive value="0"/>
-			</xsd:restriction>
-		</xsd:simpleType>
 	</xsd:element>
 	<xsd:element name="shared">
 		<xsd:annotation>
@@ -662,15 +649,10 @@ Strictly equivalent to the limitY and swingSpan2 parameters.
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="stopCFM">
+	<xsd:element name="stopCFM" type="posFloat">
 		<xsd:annotation>
 			<xsd:documentation>FSMP 2.x: Optional. Non-negative. Default 0. Soft constraints are made with this. See ODE documentation for ERP/CFM.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:simpleType>
-			<xsd:restriction base="xsd:float">
-				<xsd:minInclusive value="0"/>
-			</xsd:restriction>
-		</xsd:simpleType>
 	</xsd:element>
 	<xsd:element name="stopERP" type="factor">
 		<xsd:annotation>
