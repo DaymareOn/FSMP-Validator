@@ -36,22 +36,26 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 	<!-- simpleTypes -->
 	<!-- ############################################################ -->
 
+	<xsd:simpleType name="flexFloat">
+		<xsd:annotation>
+			<xsd:documentation>A float that accepts either a dot or a comma as decimal separator (e.g. "1.5" or "1,5"). Also accepts scientific notation and the special values INF, -INF and NaN. The hdtSMP64 runtime converts comma to dot before parsing, so both forms are valid at runtime.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="-?(\d+([.,]\d*)?|[.,]\d+)([eE][+-]?\d+)?|INF|-INF|NaN"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
 	<xsd:simpleType name="factor">
 		<xsd:annotation>
-			<xsd:documentation>A float in [0, 1]. Used for ratios, damping coefficients, and other dimensionless factors that represent a percentage or proportion.</xsd:documentation>
+			<xsd:documentation>A float in [0, 1]. Used for ratios, damping coefficients, and other dimensionless factors that represent a percentage or proportion. Accepts dot or comma as decimal separator (e.g. "0.5" or "0,5"). Range [0, 1] is enforced by the runtime, not the schema.</xsd:documentation>
 		</xsd:annotation>
-        <xsd:restriction base="xsd:float">
-            <xsd:minInclusive value="0"/>
-            <xsd:maxInclusive value="1"/>
-        </xsd:restriction>
+        <xsd:restriction base="flexFloat"/>
     </xsd:simpleType>
     <xsd:simpleType name="posFloat">
 		<xsd:annotation>
-			<xsd:documentation>A non-negative float (>= 0). Used for physical quantities that cannot be negative, such as mass, friction, stiffness, and distances.</xsd:documentation>
+			<xsd:documentation>A non-negative float (>= 0). Used for physical quantities that cannot be negative, such as mass, friction, stiffness, and distances. Accepts dot or comma as decimal separator (e.g. "1.5" or "1,5"). The non-negative constraint is enforced by the runtime, not the schema.</xsd:documentation>
 		</xsd:annotation>
-        <xsd:restriction base="xsd:float">
-            <xsd:minInclusive value="0"/>
-        </xsd:restriction>
+        <xsd:restriction base="flexFloat"/>
     </xsd:simpleType>
 	<xsd:simpleType name="shapeType">
 		<xsd:annotation>
@@ -729,7 +733,7 @@ Scales the penetration depth used when resolving per-triangle collisions. A valu
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleType>
-			<xsd:restriction base="xsd:float"/>
+			<xsd:restriction base="flexFloat"/>
 		</xsd:simpleType>
 	</xsd:element>
 	<xsd:element name="planeLimit" type="posFloat">
@@ -745,7 +749,7 @@ Strictly equivalent to the limitY and swingSpan2 parameters.
 			<xsd:documentation>Required (one or more) for shape type="hull". Vector3. A vertex of the convex hull in the bone's local space. Bullet computes the convex hull from all provided points.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="prenetration" type="xsd:float">
+	<xsd:element name="prenetration" type="flexFloat">
 		<xsd:annotation>
 			<xsd:documentation>
 				Deprecated alias for penetration. Accepted at runtime but provided for backward compatibility only. Use penetration instead.
@@ -757,7 +761,7 @@ Strictly equivalent to the limitY and swingSpan2 parameters.
 			<xsd:documentation>Optional. Factor [0, 1]. If undefined, it's set to 1. Controls the rate at which constraint error is reduced after a limit violation in a ConeTwist constraint. Lower values make corrections slower and softer; 1.0 corrects fully each step. Bullet's recommended range: 0.8 - 1.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="restitution" type="xsd:float">
+	<xsd:element name="restitution" type="flexFloat">
 		<xsd:annotation>
 			<xsd:documentation>Optional. Float. If undefined, it's set to 0. Bounciness coefficient for rigid body collisions: 0 = perfectly inelastic (no bounce), 1 = perfectly elastic (full rebound). Bullet combines the restitution of both colliding bodies to determine the collision impulse. Values outside [0, 1] are physically unrealistic.</xsd:documentation>
 		</xsd:annotation>
@@ -867,7 +871,7 @@ Affects which body's orientation determines the direction of the linear constrai
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:simpleContent>
-				<xsd:extension base="xsd:float">
+				<xsd:extension base="flexFloat">
 					<xsd:attribute name="bone" type="xsd:string" use="required"/>
 				</xsd:extension>
 			</xsd:simpleContent>
@@ -1293,9 +1297,9 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 	<xsd:complexType name="vector3">
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="x" type="xsd:float" use="required"/>
-				<xsd:attribute name="y" type="xsd:float" use="required"/>
-				<xsd:attribute name="z" type="xsd:float" use="required"/>
+				<xsd:attribute name="x" type="flexFloat" use="required"/>
+				<xsd:attribute name="y" type="flexFloat" use="required"/>
+				<xsd:attribute name="z" type="flexFloat" use="required"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -1311,10 +1315,10 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 	<xsd:complexType name="quaternion">
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="x" type="xsd:float" use="required"/>
-				<xsd:attribute name="y" type="xsd:float" use="required"/>
-				<xsd:attribute name="z" type="xsd:float" use="required"/>
-				<xsd:attribute name="w" type="xsd:float" use="required"/>
+				<xsd:attribute name="x" type="flexFloat" use="required"/>
+				<xsd:attribute name="y" type="flexFloat" use="required"/>
+				<xsd:attribute name="z" type="flexFloat" use="required"/>
+				<xsd:attribute name="w" type="flexFloat" use="required"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -1336,10 +1340,10 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 				<xsd:complexType>
 					<xsd:simpleContent>
 						<xsd:extension base="xsd:string">
-							<xsd:attribute name="x" type="xsd:float" use="required"/>
-							<xsd:attribute name="y" type="xsd:float" use="required"/>
-							<xsd:attribute name="z" type="xsd:float" use="required"/>
-							<xsd:attribute name="angle" type="xsd:float" use="required"/>
+							<xsd:attribute name="x" type="flexFloat" use="required"/>
+							<xsd:attribute name="y" type="flexFloat" use="required"/>
+							<xsd:attribute name="z" type="flexFloat" use="required"/>
+							<xsd:attribute name="angle" type="flexFloat" use="required"/>
 						</xsd:extension>
 					</xsd:simpleContent>
 				</xsd:complexType>
@@ -1349,8 +1353,8 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 	</xsd:complexType>
 	<xsd:complexType name="lerp">
 		<xsd:all>
-			<xsd:element name="translationLerp" type="xsd:float" minOccurs="0"/>
-			<xsd:element name="rotationLerp" type="xsd:float" minOccurs="0"/>
+			<xsd:element name="translationLerp" type="flexFloat" minOccurs="0"/>
+			<xsd:element name="rotationLerp" type="flexFloat" minOccurs="0"/>
 		</xsd:all>
 	</xsd:complexType>
 </xsd:schema>
