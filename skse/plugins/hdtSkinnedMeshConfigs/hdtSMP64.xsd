@@ -77,6 +77,93 @@ compound: a composite of child shapes, each defined in a child element.
 	</xsd:simpleType>
 
 	<!-- ############################################################ -->
+	<!-- root element -->
+	<!-- ############################################################ -->
+
+	<!-- Document root. Every hdtSMP64 physics XML file must have exactly one <system>
+	     element as its top-level element. All other xs:element declarations in this
+	     schema are reusable building blocks referenced via ref= — none of them are
+	     valid document roots. -->
+	<xsd:element name="system">
+		<xsd:complexType>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="bone"/>
+				<xsd:element ref="bone-default"/>
+				<xsd:element ref="conetwist-constraint"/>
+				<xsd:element ref="conetwist-constraint-default"/>
+				<xsd:element ref="constraint-group"/>
+				<xsd:element ref="generic-constraint"/>
+				<xsd:element ref="generic-constraint-default"/>
+				<xsd:element ref="per-triangle-shape"/>
+				<xsd:element ref="per-vertex-shape"/>
+				<xsd:element ref="shape"/>
+				<xsd:element ref="stiffspring-constraint"/>
+				<xsd:element ref="stiffspring-constraint-default"/>
+			</xsd:choice>
+		</xsd:complexType>
+		<xsd:key name="boneKey">
+			<xsd:selector xpath="bone"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
+		<xsd:unique name="boneDefaultKey">
+			<xsd:selector xpath="bone-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="boneDefaultKeyInBoneTemplate" refer="boneDefaultKey">
+			<xsd:selector xpath="bone"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="boneDefaultKeyInBoneExtends" refer="boneDefaultKey">
+			<xsd:selector xpath="bone|bone-default"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:unique name="conetwistConstraintDefaultKey">
+			<xsd:selector xpath="conetwist-constraint-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="conetwistConstraintDefaultKeyInConetwistConstraint" refer="conetwistConstraintDefaultKey">
+			<xsd:selector xpath="conetwist-constraint"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="conetwistConstraintDefaultKeyInConetwistConstraintTemplate" refer="conetwistConstraintDefaultKey">
+			<xsd:selector xpath="conetwist-constraint-template"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:unique name="stiffspringConstraintDefaultKey">
+			<xsd:selector xpath="stiffspring-constraint-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="stiffspringConstraintDefaultKeyInStiffspringConstraint" refer="stiffspringConstraintDefaultKey">
+			<xsd:selector xpath="stiffspring-constraint"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="stiffspringConstraintDefaultKeyInStiffspringConstraintTemplate" refer="stiffspringConstraintDefaultKey">
+			<xsd:selector xpath="stiffspring-constraint-template"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:unique name="genericConstraintDefaultKey">
+			<xsd:selector xpath="generic-constraint-default"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:keyref name="genericConstraintDefaultKeyInGenericConstraint" refer="genericConstraintDefaultKey">
+			<xsd:selector xpath="generic-constraint"/>
+			<xsd:field xpath="@template"/>
+		</xsd:keyref>
+		<xsd:keyref name="genericConstraintDefaultKeyInGenericConstraintTemplate" refer="genericConstraintDefaultKey">
+			<xsd:selector xpath="generic-constraint-template"/>
+			<xsd:field xpath="@extends"/>
+		</xsd:keyref>
+		<xsd:key name="per-triangle-shapeKey">
+			<xsd:selector xpath="per-triangle-shape"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
+		<xsd:key name="per-vertex-shapeKey">
+			<xsd:selector xpath="per-vertex-shape"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
+	</xsd:element>
+
+	<!-- ############################################################ -->
 	<!-- simple elements -->
 	<!-- ############################################################ -->
 
@@ -1198,85 +1285,6 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 			<xsd:attribute name="extends" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:element name="system">
-		<xsd:complexType>
-            <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="bone"/>
-				<xsd:element ref="bone-default"/>
-				<xsd:element ref="conetwist-constraint"/>
-				<xsd:element ref="conetwist-constraint-default"/>
-				<xsd:element ref="constraint-group"/>
-				<xsd:element ref="generic-constraint"/>
-				<xsd:element ref="generic-constraint-default"/>
-				<xsd:element ref="per-triangle-shape"/>
-				<xsd:element ref="per-vertex-shape"/>
-				<xsd:element ref="shape"/>
-				<xsd:element ref="stiffspring-constraint"/>
-				<xsd:element ref="stiffspring-constraint-default"/>
-			</xsd:choice>
-		</xsd:complexType>
-		<xsd:key name="boneKey">
-			<xsd:selector xpath="bone"/>
-			<xsd:field xpath="@name"/>
-		</xsd:key>
-		<xsd:unique name="boneDefaultKey">
-			<xsd:selector xpath="bone-default"/>
-			<xsd:field xpath="@name"/>
-		</xsd:unique>
-		<xsd:keyref name="boneDefaultKeyInBoneTemplate" refer="boneDefaultKey">
-			<xsd:selector xpath="bone"/>
-			<xsd:field xpath="@template"/>
-		</xsd:keyref>
-		<xsd:keyref name="boneDefaultKeyInBoneExtends" refer="boneDefaultKey">
-			<xsd:selector xpath="bone|bone-default"/>
-			<xsd:field xpath="@extends"/>
-		</xsd:keyref>
-		<xsd:unique name="conetwistConstraintDefaultKey">
-			<xsd:selector xpath="conetwist-constraint-default"/>
-			<xsd:field xpath="@name"/>
-		</xsd:unique>
-		<xsd:keyref name="conetwistConstraintDefaultKeyInConetwistConstraint" refer="conetwistConstraintDefaultKey">
-			<xsd:selector xpath="conetwist-constraint"/>
-			<xsd:field xpath="@template"/>
-		</xsd:keyref>
-		<xsd:keyref name="conetwistConstraintDefaultKeyInConetwistConstraintTemplate" refer="conetwistConstraintDefaultKey">
-			<xsd:selector xpath="conetwist-constraint-template"/>
-			<xsd:field xpath="@extends"/>
-		</xsd:keyref>
-		<xsd:unique name="stiffspringConstraintDefaultKey">
-			<xsd:selector xpath="stiffspring-constraint-default"/>
-			<xsd:field xpath="@name"/>
-		</xsd:unique>
-		<xsd:keyref name="stiffspringConstraintDefaultKeyInStiffspringConstraint" refer="stiffspringConstraintDefaultKey">
-			<xsd:selector xpath="stiffspring-constraint"/>
-			<xsd:field xpath="@template"/>
-		</xsd:keyref>
-		<xsd:keyref name="stiffspringConstraintDefaultKeyInStiffspringConstraintTemplate" refer="stiffspringConstraintDefaultKey">
-			<xsd:selector xpath="stiffspring-constraint-template"/>
-			<xsd:field xpath="@extends"/>
-		</xsd:keyref>
-		<xsd:unique name="genericConstraintDefaultKey">
-			<xsd:selector xpath="generic-constraint-default"/>
-			<xsd:field xpath="@name"/>
-		</xsd:unique>
-		<xsd:keyref name="genericConstraintDefaultKeyInGenericConstraint" refer="genericConstraintDefaultKey">
-			<xsd:selector xpath="generic-constraint"/>
-			<xsd:field xpath="@template"/>
-		</xsd:keyref>
-		<xsd:keyref name="genericConstraintDefaultKeyInGenericConstraintTemplate" refer="genericConstraintDefaultKey">
-			<xsd:selector xpath="generic-constraint-template"/>
-			<xsd:field xpath="@extends"/>
-		</xsd:keyref>
-		<xsd:key name="per-triangle-shapeKey">
-			<xsd:selector xpath="per-triangle-shape"/>
-			<xsd:field xpath="@name"/>
-		</xsd:key>
-		<xsd:key name="per-vertex-shapeKey">
-			<xsd:selector xpath="per-vertex-shape"/>
-			<xsd:field xpath="@name"/>
-		</xsd:key>
-	</xsd:element>
-
 
 	<!-- ############################################################ -->
 	<!-- complexTypes -->
