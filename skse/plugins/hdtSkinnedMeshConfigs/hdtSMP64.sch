@@ -5,6 +5,29 @@
 
 	<sch:ns prefix="f" uri="FSMP-Validator"/>
 
+	<sch:pattern id="invalid-physics-semantics">
+		<sch:title>Physically invalid or dead configuration</sch:title>
+
+		<!-- StiffSpring: minDistanceFactor > maxDistanceFactor causes inverted spring limits -->
+		<sch:rule context="(f:stiffspring-constraint | f:stiffspring-constraint-default)[f:minDistanceFactor and f:maxDistanceFactor and number(f:minDistanceFactor) &gt; number(f:maxDistanceFactor)]">
+			<sch:assert test="false()" role="error">minDistanceFactor is greater than maxDistanceFactor. The spring's minimum distance will exceed its maximum distance, causing the equilibrium point (a lerp between them) to fall outside the [min, max] range.</sch:assert>
+		</sch:rule>
+
+		<!-- ConeTwist: angularOnly is never read by readConeTwistConstraintTemplate -->
+		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:angularOnly">
+			<sch:assert test="false()" role="warning">angularOnly has no effect on conetwist-constraint: the current FSMP code (readConeTwistConstraintTemplate) does not handle this element — it is silently ignored at runtime.</sch:assert>
+		</sch:rule>
+
+		<!-- Static rigid body: gravity-factor and wind-factor have no effect (forces are not applied to kinematic/static bodies) -->
+		<sch:rule context="f:gravity-factor[parent::f:bone-default[f:mass = '0'] or parent::f:bone[f:mass = '0']]">
+			<sch:assert test="false()" role="warning">gravity-factor has no effect on a static rigid body (mass=0).</sch:assert>
+		</sch:rule>
+		<sch:rule context="f:wind-factor[parent::f:bone-default[f:mass = '0'] or parent::f:bone[f:mass = '0']]">
+			<sch:assert test="false()" role="warning">wind-factor has no effect on a static rigid body (mass=0).</sch:assert>
+		</sch:rule>
+
+	</sch:pattern>
+
 	<sch:pattern id="static-rigid-body">
 		<sch:title>Static rigid body constraints (mass=0)</sch:title>
 
@@ -103,7 +126,7 @@
 		<!-- #### conetwist-constraint and conetwist-constraint-default #### -->
 
 		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:angularOnly[normalize-space(.) = 'false' or normalize-space(.) = '0']">
-			<sch:assert test="false()" role="warning">angularOnly is set to its default value (false). This tag is unnecessary and can be removed.</sch:assert>
+			<sch:assert test="false()" role="warning">angularOnly is set to its default value (false). This tag is unnecessary and can be removed. Note: angularOnly has no effect regardless of its value (see invalid-physics-semantics pattern).</sch:assert>
 		</sch:rule>
 		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:biasFactor[number(.) = 0.3]">
 			<sch:assert test="false()" role="warning">biasFactor is set to its default value (0.3). This tag is unnecessary and can be removed.</sch:assert>
@@ -224,6 +247,36 @@
 		</sch:rule>
 		<sch:rule context="f:linearNonHookeanStiffness[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
 			<sch:assert test="false()" role="warning">linearNonHookeanStiffness is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+
+		<!-- #### generic-constraint bool motors (default false) #### -->
+
+		<sch:rule context="(f:generic-constraint | f:generic-constraint-default)/f:linearMotors[normalize-space(.) = 'false' or normalize-space(.) = '0']">
+			<sch:assert test="false()" role="warning">linearMotors is set to its default value (false). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+		<sch:rule context="(f:generic-constraint | f:generic-constraint-default)/f:angularMotors[normalize-space(.) = 'false' or normalize-space(.) = '0']">
+			<sch:assert test="false()" role="warning">angularMotors is set to its default value (false). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+
+		<!-- #### Vector3 elements with default (0,0,0) not yet covered above #### -->
+
+		<sch:rule context="f:linearEquilibrium[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">linearEquilibrium is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+		<sch:rule context="f:angularEquilibrium[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">angularEquilibrium is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+		<sch:rule context="f:linearMaxMotorForce[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">linearMaxMotorForce is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+		<sch:rule context="f:angularMaxMotorForce[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">angularMaxMotorForce is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+		<sch:rule context="f:linearTargetVelocity[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">linearTargetVelocity is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+		<sch:rule context="f:angularTargetVelocity[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">angularTargetVelocity is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
 
 	</sch:pattern>
