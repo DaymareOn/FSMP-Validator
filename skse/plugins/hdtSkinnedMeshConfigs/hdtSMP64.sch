@@ -279,6 +279,24 @@
 			<sch:assert test="false()" role="warning">angularTargetVelocity is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
 
+	<sch:pattern id="range-constraints">
+		<sch:title>Numeric range constraints for factor [0,1] and posFloat [>=0] types</sch:title>
+
+		<!-- Normalise comma-as-decimal-separator before comparing.
+		     translate(., ',', '.') converts "0,5" -> "0.5" so number() works correctly. -->
+
+		<!-- factor elements: must be in [0, 1] -->
+		<sch:rule context="f:angularDamping | f:biasFactor | f:equilibrium | f:gravity-factor | f:limitSoftness | f:linearDamping | f:motorERP | f:relaxationFactor | f:stopERP">
+			<sch:let name="v" value="number(translate(., ',', '.'))"/>
+			<sch:assert test="$v &gt;= 0 and $v &lt;= 1" role="error"><sch:name/> value '<sch:value-of select="."/>' is out of range: must be in [0, 1].</sch:assert>
+		</sch:rule>
+
+		<!-- posFloat elements: must be >= 0 -->
+		<sch:rule context="f:coneLimit | f:damping | f:friction | f:wind-factor | f:limitX | f:limitY | f:limitZ | f:margin | f:margin-multiplier | f:mass | f:maxDistanceFactor | f:minDistanceFactor | f:motorCFM | f:planeLimit | f:radius | f:height | f:rollingFriction | f:stiffness | f:stopCFM | f:swingSpan1 | f:swingSpan2 | f:twistLimit | f:twistSpan">
+			<sch:let name="v" value="number(translate(., ',', '.'))"/>
+			<sch:assert test="$v &gt;= 0" role="error"><sch:name/> value '<sch:value-of select="."/>' is out of range: must be non-negative (>= 0).</sch:assert>
+		</sch:rule>
+
 	</sch:pattern>
 
 </sch:schema>

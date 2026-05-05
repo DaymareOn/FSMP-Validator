@@ -38,22 +38,22 @@ As the xml is interpreted line by line, you can redefine the default so that it 
 
 	<xsd:simpleType name="flexFloat">
 		<xsd:annotation>
-			<xsd:documentation>A float that accepts either a dot or a comma as decimal separator (e.g. "1.5" or "1,5"). Also accepts scientific notation and the special values INF, -INF and NaN. The hdtSMP64 runtime converts comma to dot before parsing, so both forms are valid at runtime.</xsd:documentation>
+			<xsd:documentation>A float that accepts either a dot or a comma as decimal separator (e.g. "1.5" or "1,5"). The hdtSMP64 runtime converts comma to dot before parsing, so both forms are valid at runtime.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="-?(\d+([.,]\d*)?|[.,]\d+)([eE][+-]?\d+)?|INF|-INF|NaN"/>
+			<xsd:pattern value="-?(\d+([.,]\d*)?|[.,]\d+)"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 
 	<xsd:simpleType name="factor">
 		<xsd:annotation>
-			<xsd:documentation>A float in [0, 1]. Used for ratios, damping coefficients, and other dimensionless factors that represent a percentage or proportion. Accepts dot or comma as decimal separator (e.g. "0.5" or "0,5"). Range [0, 1] is enforced by the runtime, not the schema.</xsd:documentation>
+			<xsd:documentation>A float in [0, 1]. Used for ratios, damping coefficients, and other dimensionless factors that represent a percentage or proportion. Accepts dot or comma as decimal separator (e.g. "0.5" or "0,5"). Range [0, 1] is enforced by the Schematron rules.</xsd:documentation>
 		</xsd:annotation>
         <xsd:restriction base="flexFloat"/>
     </xsd:simpleType>
     <xsd:simpleType name="posFloat">
 		<xsd:annotation>
-			<xsd:documentation>A non-negative float (>= 0). Used for physical quantities that cannot be negative, such as mass, friction, stiffness, and distances. Accepts dot or comma as decimal separator (e.g. "1.5" or "1,5"). The non-negative constraint is enforced by the runtime, not the schema.</xsd:documentation>
+			<xsd:documentation>A non-negative float (>= 0). Used for physical quantities that cannot be negative, such as mass, friction, stiffness, and distances. Accepts dot or comma as decimal separator (e.g. "1.5" or "1,5"). The non-negative constraint is enforced by the Schematron rules.</xsd:documentation>
 		</xsd:annotation>
         <xsd:restriction base="flexFloat"/>
     </xsd:simpleType>
