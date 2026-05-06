@@ -279,6 +279,8 @@
 			<sch:assert test="false()" role="warning">angularTargetVelocity is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
 
+	</sch:pattern>
+
 	<sch:pattern id="range-constraints">
 		<sch:title>Numeric range constraints for factor [0,1] and posFloat [>=0] types</sch:title>
 
