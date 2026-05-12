@@ -99,7 +99,7 @@ element.
 
 	<!-- Document root. Every hdtSMP64 physics XML file must have exactly one <system>
 	     element as its top-level element. All other xs:element declarations in this
-	     schema are reusable building blocks referenced via ref= â€” none of them are
+	     schema are reusable building blocks referenced via ref; none of them are
 	     valid document roots. -->
 	<xsd:element name="system">
 		<xsd:complexType>
@@ -810,8 +810,7 @@ default).
 			<xsd:documentation>Optional. Float (positive or negative). If undefined, it's set to 1. Scales the
 penetration depth used when resolving per-triangle collisions. A value of 1 uses
 the natural penetration depth; negative values invert the direction of the
-collision response. Behaviour with negative values in the CUDA path is not fully
-characterised â€” prefer values >= 0.
+collision response.
 </xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleType>
@@ -990,8 +989,6 @@ the weight of the bone is zero or lower than the weight-threshold.
 weight of the shape at the vertex or triangle collision point is lower than the
 weight-threshold defined for the vertex or triangle collision point bone, then
 the collision effects aren't applied.
-- In the CUDA version, the bone weight provided to the CUDA processor is the
-bone weight-threshold.
 </xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
