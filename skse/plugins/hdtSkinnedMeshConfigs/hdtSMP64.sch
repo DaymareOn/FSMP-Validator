@@ -13,11 +13,6 @@
 			<sch:assert test="false()" role="error">minDistanceFactor is greater than maxDistanceFactor. The spring's minimum distance will exceed its maximum distance, causing the equilibrium point (a lerp between them) to fall outside the [min, max] range.</sch:assert>
 		</sch:rule>
 
-		<!-- ConeTwist: angularOnly is never read by readConeTwistConstraintTemplate -->
-		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:angularOnly">
-			<sch:assert test="false()" role="warning">angularOnly has no effect on conetwist-constraint: the current FSMP code (readConeTwistConstraintTemplate) does not handle this element — it is silently ignored at runtime.</sch:assert>
-		</sch:rule>
-
 		<!-- Static rigid body: gravity-factor and wind-factor have no effect (forces are not applied to kinematic/static bodies) -->
 		<sch:rule context="f:gravity-factor[parent::f:bone-default[f:mass = '0'] or parent::f:bone[f:mass = '0']]">
 			<sch:assert test="false()" role="warning">gravity-factor has no effect on a static rigid body (mass=0).</sch:assert>
@@ -71,25 +66,28 @@
 		<sch:rule context="(f:bone | f:bone-default)/f:margin-multiplier[number(.) = 1]">
 			<sch:assert test="false()" role="warning">margin-multiplier is set to its default value (1). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
-		<sch:rule context="(f:bone | f:bone-default)/f:collision-filter[number(.) = 0]">
-			<sch:assert test="false()" role="warning">collision-filter is set to its default value (0). This tag is unnecessary and can be removed.</sch:assert>
-		</sch:rule>
 		<sch:rule context="(f:bone | f:bone-default)/f:inertia[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
 			<sch:assert test="false()" role="warning">inertia is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
+		<sch:rule context="(f:bone | f:bone-default)/f:centerOfMassTransform[
+				not(f:basis-axis-angle) and
+				(not(f:basis) or (count(f:basis) = 1 and number(f:basis/@x) = 0 and number(f:basis/@y) = 0 and number(f:basis/@z) = 0 and number(f:basis/@w) = 1)) and
+				(not(f:origin) or (count(f:origin) = 1 and number(f:origin/@x) = 0 and number(f:origin/@y) = 0 and number(f:origin/@z) = 0))]">
+			<sch:assert test="false()" role="warning">centerOfMassTransform is set to its default value (identity: basis x=0 y=0 z=0 w=1, origin x=0 y=0 z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
 
-		<!-- #### per-triangle-shape and per-vertex-shape #### -->
+		<!-- #### per-triangle-shape, per-vertex-shape, and their defaults #### -->
 
-		<sch:rule context="(f:per-triangle-shape | f:per-vertex-shape)/f:margin[number(.) = 1]">
+		<sch:rule context="(f:per-triangle-shape | f:per-vertex-shape | f:per-triangle-shape-default | f:per-vertex-shape-default)/f:margin[number(.) = 1]">
 			<sch:assert test="false()" role="warning">margin is set to its default value (1). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
-		<sch:rule context="f:per-triangle-shape/f:penetration[number(.) = 1]">
+		<sch:rule context="(f:per-triangle-shape | f:per-triangle-shape-default)/f:penetration[number(.) = 1]">
 			<sch:assert test="false()" role="warning">penetration is set to its default value (1). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
-		<sch:rule context="f:per-triangle-shape/f:prenetration[number(.) = 1]">
+		<sch:rule context="(f:per-triangle-shape | f:per-triangle-shape-default)/f:prenetration[number(.) = 1]">
 			<sch:assert test="false()" role="warning">prenetration is set to its default value (1). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
-		<sch:rule context="(f:per-triangle-shape | f:per-vertex-shape)/f:shared[normalize-space(.) = 'public']">
+		<sch:rule context="(f:per-triangle-shape | f:per-vertex-shape | f:per-triangle-shape-default | f:per-vertex-shape-default)/f:shared[normalize-space(.) = 'public']">
 			<sch:assert test="false()" role="warning">shared is set to its default value ("public"). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
 
@@ -125,9 +123,6 @@
 
 		<!-- #### conetwist-constraint and conetwist-constraint-default #### -->
 
-		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:angularOnly[normalize-space(.) = 'false' or normalize-space(.) = '0']">
-			<sch:assert test="false()" role="warning">angularOnly is set to its default value (false). This tag is unnecessary and can be removed.</sch:assert>
-		</sch:rule>
 		<sch:rule context="(f:conetwist-constraint | f:conetwist-constraint-default)/f:biasFactor[number(.) = 0.3]">
 			<sch:assert test="false()" role="warning">biasFactor is set to its default value (0.3). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
@@ -257,6 +252,12 @@
 		<sch:rule context="(f:generic-constraint | f:generic-constraint-default)/f:angularMotors[normalize-space(.) = 'false' or normalize-space(.) = '0']">
 			<sch:assert test="false()" role="warning">angularMotors is set to its default value (false). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
+		<sch:rule context="(f:generic-constraint | f:generic-constraint-default)/f:linearDamping[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">linearDamping is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+		<sch:rule context="(f:generic-constraint | f:generic-constraint-default)/f:angularDamping[number(@x) = 0 and number(@y) = 0 and number(@z) = 0]">
+			<sch:assert test="false()" role="warning">angularDamping is set to its default value (x=0, y=0, z=0). This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
 
 		<!-- #### Vector3 elements with default (0,0,0) not yet covered above #### -->
 
@@ -288,15 +289,13 @@
 		     translate(., ',', '.') converts "0,5" -> "0.5" so number() works correctly. -->
 
 		<!-- factor elements: must be in [0, 1] -->
-		<sch:rule context="f:angularDamping | f:biasFactor | f:equilibrium | f:gravity-factor | f:limitSoftness | f:linearDamping | f:motorERP | f:relaxationFactor | f:stopERP">
-			<sch:let name="v" value="number(translate(., ',', '.'))"/>
-			<sch:assert test="$v &gt;= 0 and $v &lt;= 1" role="error"><sch:name/> value '<sch:value-of select="."/>' is out of range: must be in [0, 1].</sch:assert>
+		<sch:rule context="f:angularDamping[not(@x or @y or @z) and (number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1)] | f:biasFactor[number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1] | f:equilibrium[number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1] | f:gravity-factor[number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1] | f:limitSoftness[number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1] | f:linearDamping[not(@x or @y or @z) and (number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1)] | f:motorERP[number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1] | f:relaxationFactor[number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1] | f:stopERP[number(translate(., ',', '.')) &lt; 0 or number(translate(., ',', '.')) &gt; 1]">
+			<sch:assert test="false()" role="error"><sch:name/> value '<sch:value-of select="."/>' is out of range: must be in [0, 1].</sch:assert>
 		</sch:rule>
 
 		<!-- posFloat elements: must be >= 0 -->
-		<sch:rule context="f:coneLimit | f:damping | f:friction | f:wind-factor | f:limitX | f:limitY | f:limitZ | f:margin | f:margin-multiplier | f:mass | f:maxDistanceFactor | f:minDistanceFactor | f:motorCFM | f:planeLimit | f:radius | f:height | f:rollingFriction | f:stiffness | f:stopCFM | f:swingSpan1 | f:swingSpan2 | f:twistLimit | f:twistSpan">
-			<sch:let name="v" value="number(translate(., ',', '.'))"/>
-			<sch:assert test="$v &gt;= 0" role="error"><sch:name/> value '<sch:value-of select="."/>' is out of range: must be non-negative (>= 0).</sch:assert>
+		<sch:rule context="f:coneLimit[number(translate(., ',', '.')) &lt; 0] | f:damping[number(translate(., ',', '.')) &lt; 0] | f:friction[number(translate(., ',', '.')) &lt; 0] | f:wind-factor[number(translate(., ',', '.')) &lt; 0] | f:limitX[number(translate(., ',', '.')) &lt; 0] | f:limitY[number(translate(., ',', '.')) &lt; 0] | f:limitZ[number(translate(., ',', '.')) &lt; 0] | f:margin[number(translate(., ',', '.')) &lt; 0] | f:margin-multiplier[number(translate(., ',', '.')) &lt; 0] | f:mass[number(translate(., ',', '.')) &lt; 0] | f:maxDistanceFactor[number(translate(., ',', '.')) &lt; 0] | f:minDistanceFactor[number(translate(., ',', '.')) &lt; 0] | f:motorCFM[number(translate(., ',', '.')) &lt; 0] | f:planeLimit[number(translate(., ',', '.')) &lt; 0] | f:radius[number(translate(., ',', '.')) &lt; 0] | f:height[number(translate(., ',', '.')) &lt; 0] | f:rollingFriction[number(translate(., ',', '.')) &lt; 0] | f:stiffness[number(translate(., ',', '.')) &lt; 0] | f:stopCFM[number(translate(., ',', '.')) &lt; 0] | f:swingSpan1[number(translate(., ',', '.')) &lt; 0] | f:swingSpan2[number(translate(., ',', '.')) &lt; 0] | f:twistLimit[number(translate(., ',', '.')) &lt; 0] | f:twistSpan[number(translate(., ',', '.')) &lt; 0]">
+			<sch:assert test="false()" role="error"><sch:name/> value '<sch:value-of select="."/>' is out of range: must be non-negative (>= 0).</sch:assert>
 		</sch:rule>
 
 	</sch:pattern>
