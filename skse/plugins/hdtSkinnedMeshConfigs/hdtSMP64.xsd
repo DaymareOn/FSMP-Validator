@@ -388,9 +388,8 @@ negation-based filtering:
 - can-collide-with-tag is ignored
 - no-collide-with-bone is ignored
 - no-collide-with-tag is ignored
-You cannot mix can-collide-with-bone and no-collide-with-bone in the same shape
-â€” only can-collide-with-bone will be used. Priority rule: can-collide-with-*
-beats no-collide-with-*
+You cannot mix can-collide-with-bone and no-collide-with-bone in the same shape: only can-collide-with-bone
+will be used. Priority rule: can-collide-with-* beats no-collide-with-*
 </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -413,7 +412,7 @@ unrestricted (all collisions allowed by default).
             <xsd:documentation>Optional. Default: basis x="0" y="0" z="0" w="1", origin x="0" y="0" z="0"
 (identity). Offsets the centre of mass for this bone: the origin component
 translates the CoM, and the basis component rotates the principal axes of
-inertia. The effect is most noticeable on inertia tensor calculations â€” test
+inertia. The effect is most noticeable on inertia tensor calculations: test
 carefully when using non-default values.
 </xsd:documentation>
         </xsd:annotation>
@@ -473,22 +472,36 @@ between 2 bodies in a StiffSpring constraint.
 	</xsd:element>
 	<xsd:element name="frameInA" type="transform">
 		<xsd:annotation>
-			<xsd:documentation>Optional. Transform (basis + origin). Defines the constraint frame in body A's
-local space. If you define frameInA, it OVERRIDES the runtime default (which is
-frameInB). Important: If you define multiple frame tags (frameInA, frameInB,
-frameInLerp) in the same constraint block, the LAST ONE WINS and earlier frame
-tags are completely ignored. Best practice: define only one frame tag per
-constraint.
+			<xsd:documentation>Optional. Transform (basis + origin).
+Defines the constraint frame by writing it in body A's local space.
+FSMP then computes the matching frame for body B automatically.
+
+This answers: "In which body's local space is this frame transform written?"
+It does not answer: "Which body is the linear reference frame?" That is
+controlled separately by useLinearReferenceFrameA.
+
+If no frame tag is defined, the runtime default is frameInB.
+If multiple frame tags are defined in the same constraint block, the last one
+wins and earlier frame tags are ignored.
 </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="frameInB" type="transform">
 		<xsd:annotation>
-			<xsd:documentation>Optional. Transform (basis + origin). This is the RUNTIME DEFAULT when no frame
-tag is defined. If you omit all frame tags, frameInB defaults to Identity: basis
-x="0" y="0" z="0" w="1" origin x="0" y="0" z="0" If you define multiple frame
-tags in the same constraint block, the LAST ONE WINS. Best practice: define only
-one frame tag per constraint.
+			<xsd:documentation>Optional. Transform (basis + origin).
+Defines the constraint frame by writing it in body B's local space.
+FSMP then computes the matching frame for body A automatically.
+
+This is the runtime default when no frame tag is defined.
+If omitted entirely, it defaults to the identity transform: basis x="0" y="0"
+z="0" w="1" and origin x="0" y="0" z="0".
+
+This only controls where the frame transform is authored.
+It does not control which body is used as the linear reference frame; that is
+controlled separately by useLinearReferenceFrameA.
+
+If multiple frame tags are defined in the same constraint block, the last one
+wins and earlier frame tags are ignored.
 </xsd:documentation>
 		</xsd:annotation>
 
@@ -967,13 +980,21 @@ twistLimit and limitX parameters.
 	</xsd:element>
 	<xsd:element name="useLinearReferenceFrameA" type="xsd:boolean">
 		<xsd:annotation>
-			<xsd:documentation>Optional. Boolean. If undefined, it's set to false. Controls which body's local
-frame is used as the reference for linear (translational) degrees of freedom in
-a generic-constraint. If false (default), body B's frame is used as the linear
-reference. If true, body A's frame is used instead. Affects which body's
-orientation determines the direction of the linear constraint axes. Usually fine
-to leave at default unless you need a specific axis alignment relative to body
-A.
+			<xsd:documentation>Optional. Boolean. Default: false.
+Controls which body is used as the reference frame for the linear part of a
+generic-constraint.
+
+false = use body B as the linear reference frame
+true = use body A as the linear reference frame
+
+This does not choose whether the frame transform is written as frameInA,
+frameInB, or frameInLerp.
+Those tags define the constraint frame itself.
+This flag only changes which body's frame is treated as the linear reference
+after the frame has been computed.
+
+So it is valid to use frameInA together with useLinearReferenceFrameA=false,
+or frameInB together with useLinearReferenceFrameA=true.
 </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
