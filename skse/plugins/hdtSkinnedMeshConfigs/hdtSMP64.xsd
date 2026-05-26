@@ -610,11 +610,16 @@ wins and earlier frame tags are ignored.
 	<xsd:element name="frameInLerp" type="lerp">
 		<xsd:annotation>
 			<xsd:documentation>Optional. Linear interpolation of the constraint frame between body A and body
-B's local spaces. translationLerp: 0 = body A's position, 1 = body B's position.
-rotationLerp: 0 = body A's orientation, 1 = body B's orientation. Setting both
-to 1 is equivalent to frameInB (the runtime default). Important: If you define
-multiple frame tags in the same constraint block, the LAST ONE WINS and all
-others are ignored. Best practice: define only one frame tag per constraint.
+B's local spaces. frameInLerp is useful when the joint makes most geometric
+sense sitting between the two bones rather than anchored to either one — for
+example, a mid-chain constraint where you want symmetric behaviour relative to
+both bodies.
+translationLerp: 0 = body A's position, 1 = body B's position.
+rotationLerp: 0 = body A's orientation, 1 = body B's orientation.
+Setting both to 1 is equivalent to frameInB (the runtime default).
+Important: If you define multiple frame tags in the same constraint block,
+the LAST ONE WINS and all others are ignored.
+Best practice: define only one frame tag per constraint.
 </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
