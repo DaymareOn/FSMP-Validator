@@ -292,6 +292,21 @@ parameter value, so arbitrary attributes are permitted here.
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="patterns">
+		<xsd:annotation>
+			<xsd:documentation>Root element of a shared pattern-library file, the kind that lives in
+data/skse/plugins/hdtSkinnedMeshConfigs/patterns/. FSMP loads every such file once at startup and
+makes its pattern-default definitions available to every physics XML. A library holds only pattern
+definitions (no bones, constraints, or shapes); those live in the consuming system file.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="pattern-default" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
 	<!-- ############################################################ -->
 	<!-- simple elements -->
 	<!-- ############################################################ -->
