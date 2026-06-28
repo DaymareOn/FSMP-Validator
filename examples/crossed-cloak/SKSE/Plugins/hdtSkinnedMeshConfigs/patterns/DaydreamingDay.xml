@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/da42538f0442583349b3774b8c0fd9a6551bf78a/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<!--
+	Shared FSMP pattern library. Dropping this file in
+	Data/SKSE/Plugins/hdtSkinnedMeshConfigs/patterns/ makes the "DaydreamingDay.cloak" pattern available
+	to EVERY physics XML, so any file can build the crossed cloak with a single
+	<pattern name="DaydreamingDay.cloak"/>.
+
+	The pattern is self-contained: it emits its own bone templates (first, mass) and constraint templates
+	(capeLoose, capeLimited, capeWeft), then the CB grid that uses them. A consumer needs nothing but the
+	one-line use. The horizontal "weft" spring is the part authors actually tune, so its values are
+	exposed as parameters with sensible defaults; override any of them on the use, e.g.
+		<pattern name="DaydreamingDay.cloak" weftStiffness="6" weftLinearLimit="1.5"/>
+-->
+<patterns xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="FSMP-Validator" xsi:schemaLocation="FSMP-Validator https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/da42538f0442583349b3774b8c0fd9a6551bf78a/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.xsd">
+
+	<!--
+		The cloak as a 2-D "tissue": a CB grid (cols x rows) linked both ways. Vertical (warp) chains
+		each column top-to-bottom; horizontal (weft) ties adjacent columns at the same row. No diagonals.
+		The weft uses a deliberately loose, non-Hookean template (capeWeft) so the columns stay associated
+		without making a rigid sheet. Structure and tuning both live here now; only the weft is parameterised.
+	-->
+	<pattern-default name="cloak" author="DaydreamingDay">
+		<param name="cols" default="3"/>
+		<param name="rows" default="6"/>
+		<!-- Horizontal (weft) tuning knobs. Defaults reproduce the original starting values; override per consumer. -->
+		<param name="weftStiffness" default="4"/>
+		<param name="weftDamping" default="0.2"/>
+		<param name="weftLinearLimit" default="1"/>
+		<param name="weftAngularLimit" default="0.5"/>
+		<param name="weftNonHookean" default="0.8"/>
+		<body>
+			<!-- Bone templates. first = static anchor (row 1); mass = simulated cloth body (rows 2..rows). -->
+			<bone-default name="first">
+				<restitution>1</restitution>
+			</bone-default>
+			<bone-default name="mass">
+				<mass>0.02</mass>
+				<inertia x="1" y="1" z="1"/>
+				<linearDamping>0.8</linearDamping>
+				<angularDamping>0.8</angularDamping>
+				<friction>0.9</friction>
+				<restitution>1</restitution>
+			</bone-default>
+
+			<!-- Vertical (warp) templates. capeLoose = upper links, joint fully locked (linear + angular
+			     limits 0/0); capeLimited = lower links, locked linearly with a small angular limit.
+			     Default-valued spring/damping/equilibrium tags are omitted (the engine defaults them to 0).
+			     <frameInA/> is intentionally empty but NOT removable: the engine's default frame type is
+			     frameInB (pivot at body B). The empty tag selects frameInA (pivot at body A, identity
+			     transform) - its basis/origin children would just be identity, so they are dropped. -->
+			<generic-constraint-default name="capeLoose">
+				<frameInA/>
+				<linearLowerLimit x="0" y="0" z="0"/>
+				<linearUpperLimit x="0" y="0" z="0"/>
+				<angularLowerLimit x="0" y="0" z="0"/>
+				<angularUpperLimit x="0" y="0" z="0"/>
+			</generic-constraint-default>
+
+			<generic-constraint-default name="capeLimited">
+				<frameInA/>
+				<linearLowerLimit x="0" y="0" z="0"/>
+				<linearUpperLimit x="0" y="0" z="0"/>
+				<angularLowerLimit x="-0.1" y="-0.2" z="-0.1"/>
+				<angularUpperLimit x="0.1" y="0.2" z="0.1"/>
+			</generic-constraint-default>
+
+			<!--
+				Horizontal (weft) template: lateral cohesion that must NOT make a rigid sheet.
+				  - small linear range (+/-weftLinearLimit) lets adjacent columns separate a little;
+				  - soft linear spring (weftStiffness) gently pulls them back;
+				  - weftNonHookean softens that spring the further it stretches
+				    (stiffness * (1 - distanceFactor * weftNonHookean)), so big draping stays loose;
+				  - wide angular limits (+/-weftAngularLimit) keep rotation free.
+				All five are parameters; override on the pattern use to retune.
+			-->
+			<generic-constraint-default name="capeWeft">
+				<frameInA/>
+				<linearLowerLimit x="-${weftLinearLimit}" y="-${weftLinearLimit}" z="-${weftLinearLimit}"/>
+				<linearUpperLimit x="${weftLinearLimit}" y="${weftLinearLimit}" z="${weftLinearLimit}"/>
+				<angularLowerLimit x="-${weftAngularLimit}" y="-${weftAngularLimit}" z="-${weftAngularLimit}"/>
+				<angularUpperLimit x="${weftAngularLimit}" y="${weftAngularLimit}" z="${weftAngularLimit}"/>
+				<linearStiffness x="${weftStiffness}" y="${weftStiffness}" z="${weftStiffness}"/>
+				<linearDamping x="${weftDamping}" y="${weftDamping}" z="${weftDamping}"/>
+				<linearNonHookeanStiffness x="${weftNonHookean}" y="${weftNonHookean}" z="${weftNonHookean}"/>
+				<linearNonHookeanDamping x="${weftNonHookean}" y="${weftNonHookean}" z="${weftNonHookean}"/>
+			</generic-constraint-default>
+
+			<!-- bones: each column = anchor (row 1) + mass rows 2..rows -->
+			<repeat var="c" count="${cols}" from="1">
+				<bone name="CB 0${c} 1" template="first"/>
+				<repeat var="r" count="${rows-1}" from="2">
+					<bone name="CB 0${c} ${r}" template="mass"/>
+				</repeat>
+			</repeat>
+			<!-- vertical (warp): upper links loose, lower links limited, like the original cloak -->
+			<repeat var="c" count="${cols}" from="1">
+				<constraint-group>
+					<generic-constraint bodyA="CB 0${c} 2" bodyB="CB 0${c} 1" template="capeLoose"/>
+					<generic-constraint bodyA="CB 0${c} 3" bodyB="CB 0${c} 2" template="capeLoose"/>
+				</constraint-group>
+				<constraint-group>
+					<repeat var="r" count="${rows-3}" from="4">
+						<generic-constraint bodyA="CB 0${c} ${r}" bodyB="CB 0${c} ${r-1}" template="capeLimited"/>
+					</repeat>
+				</constraint-group>
+			</repeat>
+			<!-- horizontal (weft): adjacent columns at the same row; loose + non-Hookean -->
+			<repeat var="c" count="${cols-1}" from="1">
+				<constraint-group>
+					<repeat var="r" count="${rows-1}" from="2">
+						<generic-constraint bodyA="CB 0${c} ${r}" bodyB="CB 0${c+1} ${r}" template="capeWeft"/>
+					</repeat>
+				</constraint-group>
+			</repeat>
+		</body>
+	</pattern-default>
+</patterns>

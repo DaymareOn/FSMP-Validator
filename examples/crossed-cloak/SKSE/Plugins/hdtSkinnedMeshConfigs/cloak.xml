@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/da42538f0442583349b3774b8c0fd9a6551bf78a/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="FSMP-Validator" xsi:schemaLocation="FSMP-Validator https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/da42538f0442583349b3774b8c0fd9a6551bf78a/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.xsd">
+
+	<!--
+		Cloaks of Skyrim cloak as a CROSSED 2-D tissue (pattern example). The whole CB grid (3 columns x 6 rows),
+		its bone/constraint templates, and the warp+weft constraints all come from the shared
+		"DaydreamingDay.cloak" pattern (patterns/DaydreamingDay.xml) via the single <pattern> use below. The
+		pattern emits the cloth-simulation structure - the CB bones (which match this NIF's "CB 0c r" nodes)
+		and how they interlink; it is reusable across any cloak NIF using that naming and a cols x rows grid.
+		This file adds what is unique to THIS garment: the collision shapes, the body skeleton bones those
+		shapes skin to, and the tuning overrides. Same real CB bones as the required SMP cloak NIF, so it binds
+		in-game; needs FSMP with pattern support.
+
+		The weft (horizontal) spring is the part you tune. It is a pattern parameter, so retune by
+		overriding on the use, e.g. <pattern name="DaydreamingDay.cloak" weftStiffness="6"/> - no need to
+		touch the library. See the override on the pattern use below.
+	-->
+
+	<per-triangle-shape name="VirtualGround">
+		<margin>5</margin>
+		<tag>ground</tag>
+	</per-triangle-shape>
+
+	<!--
+		Body skeleton bones. These are NOT part of the cloak simulation: they carry no template, so
+		they default to mass 0 (kinematic, animation-driven, never simulated), and they appear in no
+		constraint. They are here because the body/feet collision meshes below (BaseShapeB -> body2,
+		FeetB -> Feet) are skinned to them in the NIF. A per-triangle-shape's geometry follows the bones
+		its vertices are weighted to, so each such bone must be declared as a <bone> or that part of the
+		collision shape has nothing to move with. They give the cloak a body to drape over and collide
+		against; remove one and the matching slice of body collision goes static.
+	-->
+	<bone name="NPC R ForearmA [RLar]"/>
+	<bone name="NPC L ForearmA [LLar]"/>
+	<bone name="CME R Forearm [RLar]"/>
+	<bone name="CME L Forearm [LLar]"/>
+	<bone name="SkirtBBone01"/>
+	<bone name="SkirtBBone02"/>
+	<bone name="SkirtBBone03"/>
+	<bone name="NPC L RearCalf [LrClf]"/>
+	<bone name="NPC R RearCalf [RrClf]"/>
+	<bone name="NPC R Breast"/>
+	<bone name="NPC R Breast01"/>
+	<bone name="NPC L Breast"/>
+	<bone name="NPC L Breast01"/>
+	<bone name="NPC L Calf [LClf]"/>
+	<bone name="NPC R Calf [RClf]"/>
+	<bone name="NPC L Clavicle [LClv]"/>
+	<bone name="NPC R Clavicle [RClv]"/>
+	<bone name="NPC R Pauldron"/>
+	<bone name="NPC L Pauldron"/>
+	<bone name="NPC Head [Head]"/>
+	<bone name="NPC Pelvis [Pelv]"/>
+	<bone name="NPC Spine [Spn0]"/>
+	<bone name="NPC Spine1 [Spn1]"/>
+	<bone name="NPC Spine2 [Spn2]"/>
+
+	<!--
+		The whole crossed cloak, from the shared library: cols=3, rows=6, plus its bone templates
+		(first, mass) and constraint templates (capeLoose, capeLimited, capeWeft). The default weft is
+		a soft, non-Hookean spring; here we override two of its knobs to make this cloak's lateral
+		cohesion a touch stiffer and roomier than the library default. Drop the attributes to fall back
+		to the defaults (weftStiffness=4, weftLinearLimit=1, ...), or add more (weftDamping,
+		weftAngularLimit, weftNonHookean) to retune further - all without editing patterns/DaydreamingDay.xml.
+	-->
+	<pattern name="DaydreamingDay.cloak" weftStiffness="6" weftLinearLimit="1.5"/>
+
+	<!--
+		Collision shapes stay HERE, in the consumer, not in the pattern - and deliberately so. A
+		per-triangle-shape binds to a named mesh in THIS NIF (BaseShapeB, FeetB, Cloak, and VirtualGround
+		above): the name must match a geometry the NIF actually contains, and its tag / no-collide-with-tag
+		wire up this garment's collision groups. The pattern already names NIF nodes too (the CB cloth
+		bones), but those follow a shared "CB 0c r" convention many cloaks reuse, so a grid pattern stays
+		portable. Collision mesh names do not - they are unique to each garment's NIF, so a library meant
+		for many cloaks cannot know them. That is why the cloth structure lives in the pattern while the
+		shapes (and the body bones they skin to) live here in the consumer.
+	-->
+	<per-triangle-shape name="BaseShapeB">
+		<margin>0</margin>
+		<prenetration>0</prenetration>
+		<tag>body2</tag>
+		<no-collide-with-tag>body</no-collide-with-tag>
+	</per-triangle-shape>
+
+	<per-triangle-shape name="FeetB">
+		<margin>0</margin>
+		<prenetration>0</prenetration>
+		<tag>Feet</tag>
+		<no-collide-with-tag>body</no-collide-with-tag>
+	</per-triangle-shape>
+
+	<per-triangle-shape name="Cloak">
+		<prenetration>0</prenetration>
+		<tag>cloth</tag>
+	</per-triangle-shape>
+
+</system>
