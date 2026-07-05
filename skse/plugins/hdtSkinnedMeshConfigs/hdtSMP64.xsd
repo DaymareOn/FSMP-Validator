@@ -6,7 +6,7 @@
 	targetNamespace="FSMP-Validator"
 	elementFormDefault="qualified"
     attributeFormDefault="unqualified"
-	version="2.1.0"
+	version="2.2.0"
 	>
 
 	<!-- ############################################################ -->
@@ -118,6 +118,9 @@ element.
 				<xsd:element ref="shape"/>
 				<xsd:element ref="stiffspring-constraint"/>
 				<xsd:element ref="stiffspring-constraint-default"/>
+				<xsd:element ref="pattern"/>
+				<xsd:element ref="pattern-default"/>
+				<xsd:element ref="repeat"/>
 			</xsd:choice>
 		</xsd:complexType>
 		<xsd:key name="boneKey">
@@ -204,6 +207,104 @@ element.
 			<xsd:selector xpath="per-vertex-shape-default"/>
 			<xsd:field xpath="@extends"/>
 		</xsd:keyref>
+	</xsd:element>
+
+	<!-- ############################################################ -->
+	<!-- pattern macros (expanded by FSMP before validation) -->
+	<!-- ############################################################ -->
+
+	<xsd:element name="pattern-default">
+		<xsd:annotation>
+			<xsd:documentation>Defines a reusable pattern macro: a parameterized cluster of bones and
+constraints. name is required; author (optional) namespaces it so its full name is author.name;
+version (optional) lets several versions of one pattern coexist. Holds zero or more param
+declarations followed by one body template. FSMP expands every pattern (and removes every
+pattern-default) before the document is validated against the rest of this schema, so a body may
+contain ${placeholders} that the strict element types would otherwise reject -- the body content is
+therefore left unvalidated here.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="param" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="body"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="author" type="xsd:string" use="optional"/>
+			<xsd:attribute name="version" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="param">
+		<xsd:annotation>
+			<xsd:documentation>Declares a pattern parameter. name is required; default (optional) is the
+value used when a use site omits the parameter -- a parameter without a default is required.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="default" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="body">
+		<xsd:annotation>
+			<xsd:documentation>The template a pattern expands to: ordinary system-level elements plus
+nested repeat and pattern uses, with ${param}/${loopVar}/${loopVar+/-N} placeholders. Left
+unvalidated (lax) because of the placeholders; FSMP validates the expanded result strictly.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="repeat">
+		<xsd:annotation>
+			<xsd:documentation>Emits its content once per index, binding var to from .. from+count-1
+(from defaults to 0). count and from are strings because they may be ${placeholders}. Nest two for a
+2-D grid. Content is left unvalidated (lax) for the same reason as body.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="var" type="xsd:string" use="required"/>
+			<xsd:attribute name="count" type="xsd:string" use="required"/>
+			<xsd:attribute name="from" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="pattern">
+		<xsd:annotation>
+			<xsd:documentation>Instantiates a pattern. name is required and is the pattern's full name
+(author.name when namespaced); version (optional) pins a version. Every other attribute supplies a
+parameter value, so arbitrary attributes are permitted here.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="version" type="xsd:string" use="optional"/>
+			<xsd:anyAttribute processContents="skip"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="patterns">
+		<xsd:annotation>
+			<xsd:documentation>Root element of a shared pattern-library file, the kind that lives in
+data/skse/plugins/hdtSkinnedMeshConfigs/patterns/. FSMP loads every such file once at startup and
+makes its pattern-default definitions available to every physics XML. A library holds only pattern
+definitions (no bones, constraints, or shapes); those live in the consuming system file.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="pattern-default" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
 	</xsd:element>
 
 	<!-- ############################################################ -->

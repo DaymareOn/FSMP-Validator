@@ -23,6 +23,37 @@
 
 	</sch:pattern>
 
+	<sch:pattern id="pattern-macros">
+		<sch:title>Pattern macro authoring rules</sch:title>
+
+		<!-- FSMP expands <pattern>/<repeat>/<pattern-default> away before its own validation, so these
+		     rules fire in an authoring editor (which sees the raw file) rather than in smp report. They
+		     are written without XPath-2.0 regex so they never error in the runtime validator. -->
+
+		<!-- <repeat count> must be a non-negative integer or a ${...} placeholder -->
+		<sch:rule context="f:repeat[not(starts-with(@count,'$')) and not(number(@count) &gt;= 0 and floor(number(@count)) = number(@count))]">
+			<sch:assert test="false()" role="error">repeat count must be a non-negative integer or a ${...} placeholder.</sch:assert>
+		</sch:rule>
+
+		<!-- <repeat from> (optional) must be an integer or a ${...} placeholder -->
+		<sch:rule context="f:repeat[@from and not(starts-with(@from,'$')) and not(floor(number(@from)) = number(@from))]">
+			<sch:assert test="false()" role="error">repeat from must be an integer or a ${...} placeholder.</sch:assert>
+		</sch:rule>
+
+		<!-- a literal count of 0 emits nothing -->
+		<sch:rule context="f:repeat[@count = '0']">
+			<sch:assert test="false()" role="warning">repeat count is 0; this repeat emits nothing.</sch:assert>
+		</sch:rule>
+
+		<!-- param and pattern-default names must not contain spaces, so ${name} / name="..." can resolve -->
+		<sch:rule context="f:param[contains(@name,' ')]">
+			<sch:assert test="false()" role="error">param name must not contain spaces.</sch:assert>
+		</sch:rule>
+		<sch:rule context="f:pattern-default[contains(@name,' ')]">
+			<sch:assert test="false()" role="error">pattern-default name must not contain spaces.</sch:assert>
+		</sch:rule>
+	</sch:pattern>
+
 	<sch:pattern id="static-rigid-body">
 		<sch:title>Static rigid body constraints (mass=0)</sch:title>
 
