@@ -78,20 +78,20 @@
 	-->
 	<per-triangle-shape name="BaseShapeB">
 		<margin>0</margin>
-		<prenetration>0</prenetration>
+		<penetration>0</penetration>
 		<tag>body2</tag>
 		<no-collide-with-tag>body</no-collide-with-tag>
 	</per-triangle-shape>
 
 	<per-triangle-shape name="FeetB">
 		<margin>0</margin>
-		<prenetration>0</prenetration>
+		<penetration>0</penetration>
 		<tag>Feet</tag>
 		<no-collide-with-tag>body</no-collide-with-tag>
 	</per-triangle-shape>
 
 	<per-triangle-shape name="Cloak">
-		<prenetration>0</prenetration>
+		<penetration>0</penetration>
 		<tag>cloth</tag>
 	</per-triangle-shape>
 
