@@ -28,9 +28,11 @@ bones** but reorganises the physics:
     non-Hookean spring so the cloak drapes as a sheet without going rigid.
   - The weft tuning is exposed as parameters (`weftStiffness`, `weftLinearLimit`, …) with
     sensible defaults.
-- **`cloak.xml`** — the consumer. It declares only what is specific to *this* NIF (the
-  collision shapes, the body skeleton bones those shapes skin to) and invokes the pattern
-  with one line, overriding two weft knobs:
+- **`cloak.xml`** — the consumer. It declares only what is specific to *this* NIF — the
+  collision shapes (the body meshes, the cloak itself, and the NIF's `VirtualGround`
+  plane, kept from the original config so the cloak drapes on a virtual floor instead of
+  falling through it) and the body skeleton bones those shapes skin to — and invokes the
+  pattern with one line, overriding two weft knobs:
 
   ```xml
   <pattern name="DaydreamingDay.cloak" weftStiffness="6" weftLinearLimit="1.5"/>
