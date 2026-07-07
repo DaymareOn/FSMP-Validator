@@ -39,10 +39,6 @@
          segments only rotate, and the angular limits give a loose cone so the tail visibly droops and
          swings but cannot fold back on itself. No springs: gravity and the creature's motion drive it. -->
     <generic-constraint-default>
-        <frameInB>
-            <basis x="0" y="0" z="0" w="1"/>
-            <origin x="0" y="0" z="0"/>
-        </frameInB>
         <linearLowerLimit x="0" y="0" z="0"/>
         <linearUpperLimit x="0" y="0" z="0"/>
         <angularLowerLimit x="-0.6" y="-0.4" z="-0.6"/>
