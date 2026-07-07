@@ -1,0 +1,71 @@
+name: Build Crossed Cloak example
+
+# Builds the Crossed Cloak pattern-example zip and shares it.
+#   Pull request  -> build the zip and upload it as a run artifact for reviewers to download.
+#                    (A pull request from a fork gets a read-only token and cannot publish a
+#                     release, so PR builds deliberately stop at the downloadable artifact.)
+#   Push to main  -> rebuild and refresh the rolling "example-latest" prerelease with the new zip.
+# Runs only when the example or this workflow changes, so unrelated schema edits don't rebuild it.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/crossed-cloak/**'
+      - '.github/workflows/build.yml'
+  pull_request:
+    paths:
+      - 'examples/crossed-cloak/**'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+# One build at a time per ref. A newer pull-request build cancels an in-flight one; a push
+# (which publishes a release) is always allowed to finish.
+concurrency:
+  group: crossed-cloak-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: write   # needed to refresh the release; a fork pull request is auto-downgraded to read-only
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash   # git-bash: clean conditionals and "|| true"; the build itself calls PowerShell
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683   # v4.2.2
+
+      - name: Build the zip
+        id: build
+        run: |
+          # package.ps1 is the single source of truth for the zip's contents and version.
+          # Run it under Windows PowerShell (the shell it was written and tested in) rather than
+          # pwsh, whose assembly loading trips the script's zip-listing step.
+          powershell -ExecutionPolicy Bypass -File examples/crossed-cloak/package.ps1
+          zip=$(ls examples/crossed-cloak/dist/*.zip | head -1)
+          echo "zip=$zip" >> "$GITHUB_OUTPUT"
+          echo "name=$(basename "$zip")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the zip as a build artifact
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882   # v4.4.3
+        with:
+          name: ${{ steps.build.outputs.name }}
+          path: ${{ steps.build.outputs.zip }}
+          if-no-files-found: error
+
+      - name: Refresh the rolling "example-latest" prerelease
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Re-point the example-latest tag at this commit and swap in the fresh zip. Deleting a
+          # release that does not exist yet (the first run) is expected, so tolerate that failure.
+          gh release delete example-latest --cleanup-tag --yes || true
+          gh release create example-latest "${{ steps.build.outputs.zip }}" \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Crossed Cloak - FSMP Pattern Example (latest build)" \
+            --notes "Rolling build from commit \`${GITHUB_SHA}\`. For a curated download, see the versioned \`example-v*\` release."
