@@ -7,9 +7,8 @@ physics of one Cloaks of Skyrim cloak as a **crossed 2-D tissue** using the FSMP
 macro feature, instead of hand-writing every bone and constraint. It is meant to be read
 alongside the two source files, which are heavily commented.
 
-> ⚠️ **Requires an FSMP build with pattern support, which is not yet released.** Until then
-> this mod only works with the test DLL handed to testers. It is published here as a
-> versioned reference, not yet as a public Nexus release.
+> ⚠️ **Requires FSMP 4.0.1 or newer** — the release that introduced pattern support. An
+> older FSMP, or the original HDT-SMP, will fail to load this file.
 
 ---
 
@@ -52,9 +51,9 @@ Install **all** of these first, in this order. This mod ships **only XML config*
 meshes or textures — so the cloak itself comes entirely from the mods below.
 
 1. **[SKSE64](http://skse.silverlock.org/)**
-2. **Faster HDT-SMP (FSMP) with pattern support** — the test build (pattern support is
-   unreleased as of this version). A stock HDT-SMP/FSMP without pattern support will fail to
-   load this file.
+2. **[Faster HDT-SMP (FSMP)](https://www.nexusmods.com/skyrimspecialedition/mods/57339)**
+   version **4.0.1 or newer** — the release that introduced pattern support. An older FSMP,
+   or the original HDT-SMP, will fail to load this file.
 3. **[Cloaks of Skyrim](https://www.nexusmods.com/skyrimspecialedition/mods/6369)** (Nikinoodles
    & Nazenn) — the base cloak items, meshes and textures.
 4. **[Artesian Cloaks of Skyrim](https://www.nexusmods.com/skyrimspecialedition/mods/17416)** —
