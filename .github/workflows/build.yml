@@ -1,71 +1,107 @@
 name: Build Crossed Cloak example
 
-# Builds the Crossed Cloak pattern-example zip and shares it.
-#   Pull request  -> build the zip and upload it as a run artifact for reviewers to download.
-#                    (A pull request from a fork gets a read-only token and cannot publish a
-#                     release, so PR builds deliberately stop at the downloadable artifact.)
-#   Push to main  -> rebuild and refresh the rolling "example-latest" prerelease with the new zip.
-# Runs only when the example or this workflow changes, so unrelated schema edits don't rebuild it.
+# Builds the Crossed Cloak pattern-example zip, publishes a versioned GitHub release, and pushes
+# the new version to Nexus Mods.
+#   Pull request  -> build the zip and upload it as a run artifact only (no release, no Nexus).
+#   Push to main  -> bump the minor version, build, publish an "example-v0.X.0" release, and
+#                    upload the new version to Nexus Mods.
+#   Manual run    -> workflow_dispatch cuts the next version on demand (same as a push to main).
+# Runs only when a file that actually ends up inside the zip changes (the SKSE config tree or the
+# README). Editing package.ps1, the schema, or this workflow does NOT rebuild the zip on its own.
 
 on:
   push:
     branches: [main]
     paths:
-      - 'examples/crossed-cloak/**'
-      - '.github/workflows/build.yml'
+      - 'examples/crossed-cloak/SKSE/**'
+      - 'examples/crossed-cloak/README.md'
   pull_request:
     paths:
-      - 'examples/crossed-cloak/**'
-      - '.github/workflows/build.yml'
+      - 'examples/crossed-cloak/SKSE/**'
+      - 'examples/crossed-cloak/README.md'
   workflow_dispatch:
 
 # One build at a time per ref. A newer pull-request build cancels an in-flight one; a push
-# (which publishes a release) is always allowed to finish.
+# (which publishes a versioned release) always finishes, so two pushes can't claim the same version.
 concurrency:
   group: crossed-cloak-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
-  contents: write   # needed to refresh the release; a fork pull request is auto-downgraded to read-only
+  contents: write   # publish the GitHub release; auto-downgraded to read on fork pull requests
 
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      # Pulled from repo secrets so the Nexus step can gate on them: it is skipped until both are
+      # set (the mod page must exist on Nexus first to have a file group id). Fork pull requests
+      # never see secrets, so these stay empty there too - and the step is push-only regardless.
+      NEXUS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+      NEXUS_FILE_GROUP_ID: ${{ secrets.NEXUSMODS_FILE_GROUP_ID }}
     defaults:
       run:
-        shell: bash   # git-bash: clean conditionals and "|| true"; the build itself calls PowerShell
+        shell: bash   # git-bash: clean conditionals and gh; the build itself calls Windows PowerShell
     steps:
       - name: Check out the repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8   # v5.0.0
 
+      - name: Work out the next version (minor + 1)
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Version scheme is 0.<minor>.0 and every release bumps the minor by one. The highest
+          # existing "example-v0.<minor>.0" release is the source of truth, so the series stays
+          # gap-free even if some pushes don't publish. "select(test(...))" filters to matching tags
+          # before "capture" so unrelated tags (example-latest, etc.) don't error out the query.
+          highest=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 200 --json tagName \
+            --jq '[.[].tagName | select(test("^example-v0\\.[0-9]+\\.0$")) | capture("^example-v0\\.(?<m>[0-9]+)\\.0$").m | tonumber] | max // 0')
+          version="0.$(( highest + 1 )).0"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=example-v$version" >> "$GITHUB_OUTPUT"
+          echo "Next version: $version"
+
       - name: Build the zip
         id: build
         run: |
-          # package.ps1 is the single source of truth for the zip's contents and version.
-          # Run it under Windows PowerShell (the shell it was written and tested in) rather than
-          # pwsh, whose assembly loading trips the script's zip-listing step.
-          powershell -ExecutionPolicy Bypass -File examples/crossed-cloak/package.ps1
-          zip=$(ls examples/crossed-cloak/dist/*.zip | head -1)
-          echo "zip=$zip" >> "$GITHUB_OUTPUT"
-          echo "name=$(basename "$zip")" >> "$GITHUB_OUTPUT"
+          # package.ps1 is the single source of truth for the zip's contents. Run it under Windows
+          # PowerShell (its tested shell) with the computed version, then copy the result to the
+          # workspace root under its bare name so every later step (artifact, release, Nexus) can
+          # reference the same file from the working directory.
+          powershell -ExecutionPolicy Bypass -File examples/crossed-cloak/package.ps1 -Version "${{ steps.version.outputs.version }}"
+          built=$(ls examples/crossed-cloak/dist/*.zip | head -1)
+          name=$(basename "$built")
+          cp "$built" "$name"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
 
       - name: Upload the zip as a build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a   # v7.0.1
         with:
           name: ${{ steps.build.outputs.name }}
-          path: ${{ steps.build.outputs.zip }}
+          path: ${{ steps.build.outputs.name }}
           if-no-files-found: error
 
-      - name: Refresh the rolling "example-latest" prerelease
-        if: github.event_name == 'push'
+      - name: Publish the versioned GitHub release
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Re-point the example-latest tag at this commit and swap in the fresh zip. Deleting a
-          # release that does not exist yet (the first run) is expected, so tolerate that failure.
-          gh release delete example-latest --cleanup-tag --yes || true
-          gh release create example-latest "${{ steps.build.outputs.zip }}" \
-            --prerelease \
+          gh release create "${{ steps.version.outputs.tag }}" "${{ steps.build.outputs.name }}" \
             --target "$GITHUB_SHA" \
-            --title "Crossed Cloak - FSMP Pattern Example (latest build)" \
-            --notes "Rolling build from commit \`${GITHUB_SHA}\`. For a curated download, see the versioned \`example-v*\` release."
+            --title "Crossed Cloak - FSMP Pattern Example v${{ steps.version.outputs.version }}" \
+            --notes "Automated build from commit \`$GITHUB_SHA\`."
+
+      - name: Upload the new version to Nexus Mods
+        # Same action and pin as the hdtSMP64 build. Skipped until NEXUSMODS_API_KEY and
+        # NEXUSMODS_FILE_GROUP_ID are set on this repo (the mod page must exist on Nexus first).
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && env.NEXUS_API_KEY != '' && env.NEXUS_FILE_GROUP_ID != ''
+        uses: Nexus-Mods/upload-action@0bf670d75d46988c176c9bfacc94ca0144e0fe3f   # v1.0.0-beta.7
+        with:
+          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+          file_group_id: ${{ secrets.NEXUSMODS_FILE_GROUP_ID }}
+          filename: ${{ steps.build.outputs.name }}
+          version: ${{ steps.version.outputs.version }}
+          display_name: Crossed Cloak - FSMP Pattern Example ${{ steps.version.outputs.version }}
+          file_category: main
+          primary_mod_manager_download: true
