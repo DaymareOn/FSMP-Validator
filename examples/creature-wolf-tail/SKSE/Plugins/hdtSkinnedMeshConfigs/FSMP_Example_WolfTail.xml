@@ -11,51 +11,42 @@
     Canine_Pelvis    - kinematic anchor: declared before the <bone-default> below, so it uses the
                        built-in default template (mass 0 = kinematic) and stays glued to the body.
     Canine_Tail1/2/3 - dynamic: declared after the mass-bearing <bone-default>, so they swing.
+
+  Only non-default values are written: any tag left out takes the engine default, so this file
+  passes "smp report" with no "unnecessary tag" warnings. See the FSMP-Validator wiki for the full
+  list of defaults.
 -->
 <system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="FSMP-Validator" xsi:schemaLocation="FSMP-Validator https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/main/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.xsd">
 
     <!-- Kinematic anchor (mass 0 via the built-in default template). Must precede the <bone-default>. -->
     <bone name="Canine_Pelvis"/>
 
-    <!-- From here on, bones are dynamic. -->
+    <!-- From here on, bones are dynamic: a light segment with a little damping so the tail settles
+         instead of jittering. -->
     <bone-default>
         <mass>1.5</mass>
         <inertia x="15" y="15" z="15"/>
-        <centerOfMassTransform>
-            <basis x="0" y="0" z="0" w="1"/>
-            <origin x="0" y="0" z="0"/>
-        </centerOfMassTransform>
         <linearDamping>0.6</linearDamping>
         <angularDamping>0.7</angularDamping>
-        <friction>0.5</friction>
         <rollingFriction>0.5</rollingFriction>
         <restitution>0.2</restitution>
-        <margin-multiplier>1</margin-multiplier>
-        <gravity-factor>1.0</gravity-factor>
     </bone-default>
     <bone name="Canine_Tail1"/>
     <bone name="Canine_Tail2"/>
     <bone name="Canine_Tail3"/>
 
-    <!-- One hinge template reused by every segment. Loose cone so the tail visibly droops and swings,
-         but bounded so it cannot fold back on itself and destabilise the simulation. No springs:
-         gravity and the creature's motion drive it. -->
+    <!-- One hinge template reused by every segment. The linear axes are locked (lower = upper = 0) so
+         segments only rotate, and the angular limits give a loose cone so the tail visibly droops and
+         swings but cannot fold back on itself. No springs: gravity and the creature's motion drive it. -->
     <generic-constraint-default>
         <frameInB>
             <basis x="0" y="0" z="0" w="1"/>
             <origin x="0" y="0" z="0"/>
         </frameInB>
-        <useLinearReferenceFrameA>false</useLinearReferenceFrameA>
         <linearLowerLimit x="0" y="0" z="0"/>
         <linearUpperLimit x="0" y="0" z="0"/>
         <angularLowerLimit x="-0.6" y="-0.4" z="-0.6"/>
         <angularUpperLimit x="0.6" y="0.4" z="0.6"/>
-        <linearStiffness x="0" y="0" z="0"/>
-        <angularStiffness x="0" y="0" z="0"/>
-        <linearDamping x="0" y="0" z="0"/>
-        <angularDamping x="0" y="0" z="0"/>
-        <linearEquilibrium x="0" y="0" z="0"/>
-        <angularEquilibrium x="0" y="0" z="0"/>
     </generic-constraint-default>
 
     <constraint-group>
