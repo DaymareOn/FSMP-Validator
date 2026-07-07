@@ -37,7 +37,8 @@
     <bone name="Canine_Tail3"/>
 
     <!-- One hinge template reused by every segment. Loose cone so the tail visibly droops and swings,
-         but bounded so it cannot fold back on itself and blow up. No springs: gravity and motion do it. -->
+         but bounded so it cannot fold back on itself and destabilise the simulation. No springs:
+         gravity and the creature's motion drive it. -->
     <generic-constraint-default>
         <frameInB>
             <basis x="0" y="0" z="0" w="1"/>
