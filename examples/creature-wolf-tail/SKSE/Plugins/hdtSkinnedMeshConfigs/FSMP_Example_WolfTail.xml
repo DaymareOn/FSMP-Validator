@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/refs/heads/main/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <!--
   FSMP creature-physics example: a physics-driven tail for canines (wolf / dog / fox).
 
@@ -11,7 +12,7 @@
                        built-in default template (mass 0 = kinematic) and stays glued to the body.
     Canine_Tail1/2/3 - dynamic: declared after the mass-bearing <bone-default>, so they swing.
 -->
-<system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="hdtSMP64.xsd">
+<system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="FSMP-Validator" xsi:schemaLocation="FSMP-Validator https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/main/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.xsd">
 
     <!-- Kinematic anchor (mass 0 via the built-in default template). Must precede the <bone-default>. -->
     <bone name="Canine_Pelvis"/>
