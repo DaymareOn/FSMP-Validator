@@ -107,6 +107,20 @@
 			<sch:assert test="false()" role="warning">centerOfMassTransform is set to its default value (identity: basis x=0 y=0 z=0 w=1, origin x=0 y=0 z=0). This tag is unnecessary and can be removed.</sch:assert>
 		</sch:rule>
 
+		<!-- #### generic-constraint and conetwist-constraint frame #### -->
+
+		<!-- An identity frameInB matches the runtime default (frameType defaults to FrameInB, frame to
+		     identity). It is removable ONLY when it is the constraint's sole frame tag: if a frameInA or
+		     frameInLerp is also present the "last tag wins", and if there are two frameInB tags removing
+		     this one could expose a different frame, so both are excluded to avoid a false positive. -->
+		<sch:rule context="(f:generic-constraint | f:generic-constraint-default | f:conetwist-constraint | f:conetwist-constraint-default)/f:frameInB[
+				not(f:basis-axis-angle) and
+				(not(f:basis) or (count(f:basis) = 1 and number(f:basis/@x) = 0 and number(f:basis/@y) = 0 and number(f:basis/@z) = 0 and number(f:basis/@w) = 1)) and
+				(not(f:origin) or (count(f:origin) = 1 and number(f:origin/@x) = 0 and number(f:origin/@y) = 0 and number(f:origin/@z) = 0)) and
+				not(../f:frameInA) and not(../f:frameInLerp) and count(../f:frameInB) = 1]">
+			<sch:assert test="false()" role="warning">frameInB is set to its default value (identity: basis x=0 y=0 z=0 w=1, origin x=0 y=0 z=0) and is the constraint's only frame tag, so it matches the runtime default. This tag is unnecessary and can be removed.</sch:assert>
+		</sch:rule>
+
 		<!-- #### per-triangle-shape, per-vertex-shape, and their defaults #### -->
 
 		<sch:rule context="(f:per-triangle-shape | f:per-vertex-shape | f:per-triangle-shape-default | f:per-vertex-shape-default)/f:margin[number(.) = 1]">
