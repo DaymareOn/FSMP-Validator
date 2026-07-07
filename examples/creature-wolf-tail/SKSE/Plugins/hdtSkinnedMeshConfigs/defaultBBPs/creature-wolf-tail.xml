@@ -3,14 +3,15 @@
   Maps the canine races to the tail physics file, keyed on each race's skeleton NIF path. FSMP applies
   the file to any canine that has no embedded-tag outfit and nothing equipped.
 
+  This is a drop-in in the defaultBBPs/ folder (FSMP 4.1.0+): FSMP reads every *.xml here in addition
+  to the single defaultBBPs.xml, so this file coexists with other mods' mappings with no conflict:
+  no overwriting, no merging. (On an older FSMP you would instead merge these <creature> lines into the
+  shared defaultBBPs.xml by hand.)
+
   The "skeleton" attribute must match the RACE record's skeleton path exactly. Vanilla uses the shared
   "Actors\Canine\Character Assets\skeleton.nif"; XPMSSE-style setups split it into "...Character Assets
   Wolf/Dog\skeleton.nif". All three are listed so this works on either. Discover the exact string for a
   given creature from the FSMP log line "creature physics: race ... skeleton model '...'" (log level Debug).
-
-  NOTE: only one defaultBBPs.xml wins in the virtual file system. In a real load order, MERGE these
-  <creature> lines into your existing defaultBBPs.xml rather than letting this file override it (which
-  would drop a body mod's humanoid mappings). See the FSMP-Validator wiki for the alternatives.
 -->
 <default-bbps>
 	<creature skeleton="Actors\Canine\Character Assets Wolf\skeleton.nif" file="SKSE\Plugins\hdtSkinnedMeshConfigs\FSMP_Example_WolfTail.xml"/>
