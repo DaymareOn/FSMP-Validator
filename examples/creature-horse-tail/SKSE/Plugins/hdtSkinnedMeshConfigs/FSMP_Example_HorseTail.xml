@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/refs/heads/main/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<!--
+  FSMP creature-physics example: a physics-driven tail for horses.
+
+  Bone-only system: it declares no mesh shape. SMP simulates the tail bones as rigid bodies and writes
+  their transforms back to the skeleton every frame; the horse's own vanilla tail mesh is skinned to
+  those bones, so it simply follows. That is why this needs no new or edited mesh.
+
+  Bones (present in every horse skeleton — vanilla, XPMSSE, War Horse, Slim Horse):
+    HorsePelvis        - kinematic anchor: declared before the <bone-default>, so it uses the built-in
+                         default template (mass 0 = kinematic) and stays glued to the horse's body.
+    HorseTail1..Tail4  - dynamic: declared after the mass-bearing <bone-default>, so they swing. These
+                         are the vanilla tail bones the tail mesh is skinned to, so making them dynamic
+                         moves the visible tail (physics replaces the scripted tail-swish animation).
+
+  Only non-default values are written, so this file reports no "unnecessary tag" warnings in smp report.
+-->
+<system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="FSMP-Validator" xsi:schemaLocation="FSMP-Validator https://raw.githubusercontent.com/DaymareOn/FSMP-Validator/main/skse/plugins/hdtSkinnedMeshConfigs/hdtSMP64.xsd">
+
+    <!-- Kinematic anchor (mass 0 via the built-in default template). Must precede the <bone-default>. -->
+    <bone name="HorsePelvis"/>
+
+    <!-- From here on, bones are dynamic: a light segment with a little damping so the tail settles
+         instead of jittering. -->
+    <bone-default>
+        <mass>1.5</mass>
+        <inertia x="15" y="15" z="15"/>
+        <linearDamping>0.6</linearDamping>
+        <angularDamping>0.7</angularDamping>
+        <rollingFriction>0.5</rollingFriction>
+        <restitution>0.2</restitution>
+    </bone-default>
+    <bone name="HorseTail1"/>
+    <bone name="HorseTail2"/>
+    <bone name="HorseTail3"/>
+    <bone name="HorseTail4"/>
+
+    <!-- One hinge template reused by every segment. The linear axes are locked (lower = upper = 0) so
+         segments only rotate, and the angular limits give a loose cone so the tail visibly droops and
+         swings but cannot fold back on itself. No springs: gravity and the horse's motion drive it. -->
+    <generic-constraint-default>
+        <linearLowerLimit x="0" y="0" z="0"/>
+        <linearUpperLimit x="0" y="0" z="0"/>
+        <angularLowerLimit x="-0.6" y="-0.4" z="-0.6"/>
+        <angularUpperLimit x="0.6" y="0.4" z="0.6"/>
+    </generic-constraint-default>
+
+    <constraint-group>
+        <generic-constraint bodyA="HorseTail1" bodyB="HorsePelvis"/>
+        <generic-constraint bodyA="HorseTail2" bodyB="HorseTail1"/>
+        <generic-constraint bodyA="HorseTail3" bodyB="HorseTail2"/>
+        <generic-constraint bodyA="HorseTail4" bodyB="HorseTail3"/>
+    </constraint-group>
+
+</system>

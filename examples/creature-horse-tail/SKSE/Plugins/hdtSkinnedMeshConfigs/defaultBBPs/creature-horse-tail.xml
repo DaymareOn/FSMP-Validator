@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Maps the horse race to the tail physics file, keyed on the race's skeleton NIF path. FSMP applies the
+  file to any horse that has no embedded-tag outfit and nothing equipped.
+
+  This is a drop-in in the defaultBBPs/ folder (FSMP 4.1.0+): FSMP reads every *.xml here in addition to
+  the single defaultBBPs.xml, so this file coexists with other mods' mappings with no conflict.
+
+  The "skeleton" attribute must match the RACE record's skeleton path exactly. Regular horses use the
+  shared "Actors\Horse\Character Assets\skeleton.nif". If a specific horse (a mod mount, a special race)
+  does not react, read the exact path from the FSMP log line
+  "creature physics: race ... skeleton model '...'" (log level Debug) and add it here.
+-->
+<default-bbps>
+	<creature skeleton="Actors\Horse\Character Assets\skeleton.nif" file="SKSE\Plugins\hdtSkinnedMeshConfigs\FSMP_Example_HorseTail.xml"/>
+</default-bbps>
