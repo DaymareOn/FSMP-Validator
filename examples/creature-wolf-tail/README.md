@@ -31,10 +31,10 @@ new pieces that let a plain, unarmored creature get physics from a config file a
     loose but bounded cone of motion — no springs, so gravity and the creature's motion do all the
     work, and the bounds stop the tail folding back on itself.
 
-- **`SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-wolf-tail.xml`** — the **per-race
+- **`SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-wolf-tail.xml`** — the **skeleton
   default** that binds the physics file to canines, shipped as a **drop-in in the `defaultBBPs/`
   folder** (FSMP 4.1.0+) so it never clashes with other mods (see Installation). FSMP 4.1.0 added the
-  `<creature>` mapping, keyed on the race's **skeleton NIF path**, and applies the file to any matching
+  `<skeleton>` mapping, keyed on the race's **skeleton NIF path**, and applies the file to any matching
   creature that has no embedded-tag physics and nothing equipped. Three skeleton paths are listed so it
   covers both the vanilla shared skeleton (`Actors\Canine\Character Assets\skeleton.nif`) and
   XPMSSE-style split skeletons (`...Character Assets Wolf\` / `Dog\`).
@@ -64,19 +64,19 @@ Install with a mod manager (MO2/Vortex). The mod adds two files:
 
 ```
 SKSE/Plugins/hdtSkinnedMeshConfigs/FSMP_Example_WolfTail.xml          (physics file)
-SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-wolf-tail.xml (per-race default mapping)
+SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-wolf-tail.xml (skeleton default mapping)
 ```
 
 The mapping is a **drop-in** in the `defaultBBPs/` folder, new in FSMP 4.1.0: FSMP reads every
 `*.xml` there *in addition to* the single `defaultBBPs.xml`, so this file coexists with every other
 mod's mappings with **no conflict** — nothing to overwrite, nothing to merge. (Before 4.1.0 there was
-only one shared `defaultBBPs.xml`, and mods had to hand-merge their `<creature>` lines into it; the
+only one shared `defaultBBPs.xml`, and mods had to hand-merge their `<skeleton>` lines into it; the
 folder removes that headache. See [Creatures and animals](https://github.com/DaymareOn/FSMP-Validator/wiki/22-%E2%80%90-Creatures-and-animals).)
 
 Then load a save near a wolf or dog (or `player.placeatme` one) with the creature toggle on, and its
 tail will start to swing. If nothing moves, set the FSMP log level to **Debug** and look for the line
-`creature physics: race ... skeleton model '...'` — it prints the exact skeleton path that race uses,
-which is what the `skeleton=` attribute must match.
+`skeleton default: race ... skeleton model '...'` — it prints the exact skeleton path that race uses,
+which is what the `model=` attribute must match.
 
 ---
 

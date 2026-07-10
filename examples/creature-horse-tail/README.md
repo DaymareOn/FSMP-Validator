@@ -25,7 +25,7 @@ The same two pieces as the wolf tail, on a rideable mount:
   reusable hinge template with a loose, bounded cone of motion (no springs). `HorseTail1`…`HorseTail4`
   are present in every horse skeleton (vanilla, XPMSSE, War Horse, Slim Horse), so this is portable.
 
-- **`SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-horse-tail.xml`** — the **per-race default**
+- **`SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-horse-tail.xml`** — the **skeleton default**
   that binds the physics file to the horse race by its skeleton path, shipped as a drop-in in the
   `defaultBBPs/` folder so it never clashes with other mods.
 
@@ -51,7 +51,7 @@ Install with a mod manager (MO2/Vortex) after FSMP. It adds two files:
 
 ```
 SKSE/Plugins/hdtSkinnedMeshConfigs/FSMP_Example_HorseTail.xml          (physics file)
-SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-horse-tail.xml (per-race default mapping)
+SKSE/Plugins/hdtSkinnedMeshConfigs/defaultBBPs/creature-horse-tail.xml (skeleton default mapping)
 ```
 
 The mapping is a **drop-in** in the `defaultBBPs/` folder (FSMP 4.1.0+): FSMP reads it alongside the
@@ -60,7 +60,7 @@ single `defaultBBPs.xml` with no conflict — nothing to overwrite or merge. See
 
 Then approach or summon a horse with the toggle on, and its tail will start to swing. Mount and ride —
 the tail keeps simulating behind you. If nothing moves, set the FSMP log level to **Debug** and read
-the line `creature physics: race ... skeleton model '...'`: that is the exact path the `skeleton=`
+the line `skeleton default: race ... skeleton model '...'`: that is the exact path the `model=`
 attribute must match for the horse you are testing.
 
 ---
